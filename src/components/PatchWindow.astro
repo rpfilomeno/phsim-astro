@@ -1,0 +1,235 @@
+---
+import { filters, patches } from '../data/patches';
+
+const toneClass = {
+  error: 'text-error',
+  primary: 'text-primary',
+  tertiary: 'text-tertiary',
+};
+---
+
+<section
+  id="patch-log"
+  aria-labelledby="patch-window-title"
+  class="bg-surface-container rounded shadow-md overflow-hidden"
+>
+  <div
+    class="bg-primary text-on-primary px-space-md py-1.5 flex items-center justify-between gap-space-sm select-none"
+  >
+    <div class="flex items-center gap-space-sm min-w-0">
+      <span class="inline-block w-3 h-3 bg-secondary-container rounded-full shrink-0" aria-hidden="true"
+      ></span>
+      <span class="font-title-md text-body-sm tracking-wide font-bold truncate"
+        >PH_PatchLog_Episode_7107_Archipelago.exe - [Midgarts Philippines Server
+        Registry]</span
+      >
+    </div>
+    <div class="flex items-center gap-1 font-label-badge text-label-badge shrink-0" aria-hidden="true">
+      <span class="px-1.5 py-0.5 bg-primary-container rounded">_</span>
+      <span class="px-1.5 py-0.5 bg-primary-container rounded">□</span>
+      <span class="px-1.5 py-0.5 bg-tertiary-container rounded">✕</span>
+    </div>
+  </div>
+
+  <div
+    class="p-space-md bg-surface-container-high flex flex-col md:flex-row justify-between items-start md:items-center gap-space-sm"
+  >
+    <div>
+      <div class="flex items-center gap-space-xs flex-wrap">
+        <span
+          class="px-2 py-0.5 bg-secondary text-on-secondary rounded font-label-badge text-label-badge uppercase"
+          >EPISODE 7107.25</span
+        >
+        <span
+          class="px-2 py-0.5 bg-surface-container text-on-surface-variant font-label-badge text-label-badge"
+          >VER: PH-7.10.4-PROD</span
+        >
+        <span
+          class="px-2 py-0.5 bg-primary-container text-on-primary font-label-badge text-label-badge"
+          >STATUS: APPLIED</span
+        >
+      </div>
+      <h1
+        id="patch-window-title"
+        class="font-headline-lg text-headline-md md:text-headline-lg text-primary mt-1 font-bold"
+      >
+        The Onion Cartel Monopoly, Jeepney Modernization Rebalance &amp; The Great Summer
+        Heat Index Nerf
+      </h1>
+    </div>
+    <div
+      class="bg-surface-container px-space-md py-1.5 rounded text-left md:text-right shrink-0"
+    >
+      <span class="block font-label-badge text-label-badge text-on-surface-variant"
+        >WEEKLY SERVER REBOOT</span
+      >
+      <span class="font-label-data text-label-data text-tertiary font-bold"
+        >Every Tue 06:00 ~ 14:00 PHT (+4h Brownout Extension)</span
+      >
+    </div>
+  </div>
+
+  <div class="p-space-lg bg-surface-container-lowest flex flex-col gap-space-lg">
+    <div>
+      <div
+        data-patch-filters
+        role="group"
+        aria-label="Filter patch notes by category"
+        class="flex items-center gap-1 bg-surface-container p-1 rounded overflow-x-auto"
+      >
+        {
+          filters.map((filter, index) => (
+            <button
+              type="button"
+              data-filter={filter.id}
+              aria-pressed={index === 0 ? 'true' : 'false'}
+              class="filter-tab"
+            >
+              {filter.label}
+            </button>
+          ))
+        }
+      </div>
+      <p id="patch-filter-status" class="sr-only" role="status"></p>
+    </div>
+
+    {
+      patches.map((patch) => (
+        <article
+          data-patch={patch.slug}
+          class="p-space-md bg-surface-container-low rounded flex flex-col gap-space-sm"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-space-sm">
+            <span
+              class:list={[
+                'px-1.5 py-0.5 font-label-badge text-label-badge rounded',
+                patch.tagClass,
+              ]}
+            >
+              [{patch.tag}]
+            </span>
+            <span class="font-label-badge text-label-badge text-on-surface-variant">
+              CODE: {patch.code}
+            </span>
+          </div>
+
+          <h2 class="font-headline-md text-title-md text-primary font-bold">
+            {patch.title}
+          </h2>
+
+          <p class="font-body-md text-body-md text-on-surface leading-relaxed">{patch.body}</p>
+
+          <ul class="flex flex-wrap gap-1" aria-label="Affected classes">
+            <li class="font-label-badge text-label-badge text-on-surface-variant self-center uppercase">
+              Affected:
+            </li>
+            {patch.classes.map((job) => (
+              <li class="px-1.5 py-0.5 bg-surface-container text-on-surface rounded font-label-badge text-label-badge">
+                {job}
+              </li>
+            ))}
+          </ul>
+
+          <div
+            class:list={[
+              'grid grid-cols-1 gap-space-xs',
+              patch.stats.length === 3 ? 'sm:grid-cols-2 md:grid-cols-3' : 'sm:grid-cols-2',
+            ]}
+          >
+            {patch.stats.map((stat) => (
+              <div class="p-space-sm bg-surface-container rounded flex flex-col">
+                <span class="font-label-badge text-label-badge text-on-surface-variant uppercase">
+                  {stat.label}
+                </span>
+                <span
+                  class:list={[
+                    'font-label-data text-label-data font-bold mt-0.5',
+                    toneClass[stat.tone ?? 'primary'],
+                  ]}
+                >
+                  {stat.value}
+                </span>
+                {stat.note && (
+                  <span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+                    {stat.note}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {patch.notice && (
+            <div class="p-space-sm bg-error-container text-on-error-container rounded flex items-center gap-space-sm">
+              <svg
+                class="w-4 h-4 shrink-0 text-error"
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                aria-hidden="true"
+              >
+                <path d="M8 1.5 15 14H1L8 1.5Z" stroke-linejoin="round"></path>
+                <path d="M8 6v3.5M8 11.5v.5" stroke-linecap="round"></path>
+              </svg>
+              <p class="font-body-sm text-body-sm font-semibold">{patch.notice}</p>
+            </div>
+          )}
+
+          <details class="group rounded border border-surface-variant bg-surface-container-lowest">
+            <summary class="cursor-pointer list-none [&::-webkit-details-marker]:hidden flex items-center justify-between gap-space-sm p-space-sm font-label-badge text-label-badge uppercase text-primary hover:bg-surface-container transition-colors">
+              <span>GM Dev Notes</span>
+              <svg
+                class="w-4 h-4 shrink-0 transition-transform group-open:rotate-180"
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <path d="M3 6l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+            </summary>
+            <p class="px-space-sm pb-space-sm font-body-sm text-body-sm text-on-surface-variant">
+              {patch.gmNote}
+            </p>
+          </details>
+        </article>
+      ))
+    }
+
+    <div
+      class="p-space-sm bg-surface-container-high rounded flex flex-col md:flex-row justify-between items-center gap-space-xs font-label-data text-label-data text-on-surface-variant"
+    >
+      <span>CLIENT BUILD: 20250225_PROD_PH_MIDGARTS</span>
+      <span class="font-mono">MD5: pinoy_server_build_ver_7107</span>
+      <span class="text-secondary font-bold">[ALL PH SERVERS VERIFIED]</span>
+    </div>
+  </div>
+</section>
+
+<script>
+  const filterBar = document.querySelector('[data-patch-filters]');
+
+  if (filterBar) {
+    const buttons = Array.from(filterBar.querySelectorAll<HTMLButtonElement>('button[data-filter]'));
+    const articles = Array.from(document.querySelectorAll<HTMLElement>('article[data-patch]'));
+    const status = document.getElementById('patch-filter-status');
+
+    buttons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const filter = button.dataset.filter ?? 'all';
+        let shown = 0;
+
+        buttons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+
+        articles.forEach((article) => {
+          const visible = filter === 'all' || article.dataset.patch === filter;
+          article.hidden = !visible;
+          if (visible) shown += 1;
+        });
+
+        if (status) status.textContent = `${shown} of ${articles.length} releases shown.`;
+      });
+    });
+  }
+</script>

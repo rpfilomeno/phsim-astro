@@ -1,0 +1,186 @@
+@import "tailwindcss";
+
+@theme {
+  --color-surface: #fff9ed;
+  --color-surface-dim: #e0d9ca;
+  --color-surface-bright: #fff9ed;
+  --color-surface-variant: #e9e2d2;
+  --color-surface-tint: #33628b;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #faf3e3;
+  --color-surface-container: #f4eddd;
+  --color-surface-container-high: #efe8d8;
+  --color-surface-container-highest: #e9e2d2;
+  --color-background: #fff9ed;
+  --color-on-background: #1e1c12;
+  --color-on-surface: #1e1c12;
+  --color-on-surface-variant: #42474e;
+  --color-inverse-surface: #333026;
+  --color-inverse-on-surface: #f7f0e0;
+
+  --color-primary: #09436b;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #2b5b84;
+  --color-on-primary-container: #a8d2ff;
+  --color-primary-fixed: #cfe5ff;
+  --color-primary-fixed-dim: #9ecbfa;
+  --color-on-primary-fixed: #001d33;
+  --color-on-primary-fixed-variant: #154a72;
+  --color-inverse-primary: #9ecbfa;
+
+  --color-secondary: #735c00;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #fed65b;
+  --color-on-secondary-container: #745c00;
+  --color-secondary-fixed: #ffe088;
+  --color-secondary-fixed-dim: #e9c349;
+  --color-on-secondary-fixed: #241a00;
+  --color-on-secondary-fixed-variant: #574500;
+
+  --color-tertiary: #762136;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #94384c;
+  --color-on-tertiary-container: #ffbdc6;
+  --color-tertiary-fixed: #ffd9dd;
+  --color-tertiary-fixed-dim: #ffb2bd;
+  --color-on-tertiary-fixed: #400013;
+  --color-on-tertiary-fixed-variant: #7e273c;
+
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+
+  --color-outline: #72777f;
+  --color-outline-variant: #c2c7cf;
+
+  --font-headline-xl: "EB Garamond", Georgia, serif;
+  --font-headline-lg: "EB Garamond", Georgia, serif;
+  --font-headline-md: "EB Garamond", Georgia, serif;
+  --font-headline-xl-mobile: "EB Garamond", Georgia, serif;
+  --font-body-lg: "Inter", system-ui, sans-serif;
+  --font-body-md: "Inter", system-ui, sans-serif;
+  --font-body-sm: "Inter", system-ui, sans-serif;
+  --font-title-md: "Inter", system-ui, sans-serif;
+  --font-label-data: "JetBrains Mono", ui-monospace, monospace;
+  --font-label-badge: "JetBrains Mono", ui-monospace, monospace;
+
+  --text-headline-xl: 40px;
+  --text-headline-xl--line-height: 48px;
+  --text-headline-xl--letter-spacing: -0.02em;
+  --text-headline-xl--font-weight: 700;
+  --text-headline-xl-mobile: 30px;
+  --text-headline-xl-mobile--line-height: 36px;
+  --text-headline-xl-mobile--letter-spacing: -0.01em;
+  --text-headline-xl-mobile--font-weight: 700;
+  --text-headline-lg: 28px;
+  --text-headline-lg--line-height: 34px;
+  --text-headline-lg--letter-spacing: -0.01em;
+  --text-headline-lg--font-weight: 600;
+  --text-headline-md: 22px;
+  --text-headline-md--line-height: 28px;
+  --text-headline-md--font-weight: 600;
+  --text-title-md: 16px;
+  --text-title-md--line-height: 22px;
+  --text-title-md--font-weight: 700;
+  --text-body-lg: 15px;
+  --text-body-lg--line-height: 24px;
+  --text-body-md: 13px;
+  --text-body-md--line-height: 20px;
+  --text-body-sm: 11px;
+  --text-body-sm--line-height: 16px;
+  --text-label-data: 12px;
+  --text-label-data--line-height: 16px;
+  --text-label-data--letter-spacing: 0.02em;
+  --text-label-data--font-weight: 600;
+  --text-label-badge: 10px;
+  --text-label-badge--line-height: 12px;
+  --text-label-badge--letter-spacing: 0.06em;
+  --text-label-badge--font-weight: 700;
+
+  --spacing-gutter: 1rem;
+  --spacing-gutter-desktop: 1.5rem;
+  --spacing-margin: 1rem;
+  --spacing-margin-desktop: 2.5rem;
+  --spacing-space-xs: 0.25rem;
+  --spacing-space-sm: 0.5rem;
+  --spacing-space-md: 0.75rem;
+  --spacing-space-lg: 1.25rem;
+  --spacing-space-xl: 2rem;
+}
+
+@layer base {
+  [hidden] {
+    display: none !important;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    scroll-padding-top: 1rem;
+  }
+
+  @media (min-width: 64rem) {
+    html {
+      scroll-padding-top: 7rem;
+    }
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+@layer components {
+  .skip-link {
+    position: fixed;
+    top: 0.5rem;
+    left: 0.5rem;
+    z-index: 100;
+    transform: translateY(-200%);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.25rem;
+    font-family: var(--font-label-data);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .skip-link:focus-visible {
+    transform: none;
+  }
+
+  .filter-tab {
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.25rem;
+    background: var(--color-surface-container);
+    color: var(--color-on-surface-variant);
+    font-family: var(--font-label-badge);
+    font-size: 10px;
+    line-height: 12px;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    white-space: nowrap;
+    transition:
+      background-color 150ms ease,
+      color 150ms ease;
+  }
+
+  .filter-tab:hover {
+    background: var(--color-surface-container-high);
+  }
+
+  .filter-tab[aria-pressed="true"] {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
+  }
+}

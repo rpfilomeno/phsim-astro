@@ -1,0 +1,29 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className = 'w-16 h-16' } = Astro.props;
+---
+
+<svg
+  class={className}
+  viewBox="0 0 16 16"
+  shape-rendering="crispEdges"
+  aria-hidden="true"
+  focusable="false"
+>
+  <rect width="16" height="16" fill="#e9e2d2"></rect>
+  <rect x="4" y="2" width="8" height="1" fill="#2b5b84"></rect>
+  <rect x="3" y="3" width="10" height="6" fill="#09436b"></rect>
+  <rect x="5" y="4" width="6" height="5" fill="#f0c9a0"></rect>
+  <rect x="4" y="4" width="1" height="4" fill="#09436b"></rect>
+  <rect x="11" y="4" width="1" height="4" fill="#09436b"></rect>
+  <rect x="4" y="2" width="8" height="2" fill="#09436b"></rect>
+  <rect x="6" y="6" width="1" height="1" fill="#1e1c12"></rect>
+  <rect x="9" y="6" width="1" height="1" fill="#1e1c12"></rect>
+  <rect x="7" y="8" width="2" height="1" fill="#762136"></rect>
+  <rect x="2" y="10" width="12" height="6" fill="#762136"></rect>
+  <rect x="6" y="10" width="4" height="2" fill="#ffe088"></rect>
+  <rect x="7" y="12" width="2" height="1" fill="#ffe088"></rect>
+</svg>

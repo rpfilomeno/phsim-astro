@@ -1,0 +1,104 @@
+# Project Requirements Document (PRD) & Creative Brief
+## Midgarts PH: The Pearl Archipelago (Republic Server Patch Portal)
+
+---
+
+### 1. Executive Summary & Vision
+
+**Midgarts PH** is a satirical, high-fidelity web portal that gamifies real-world Philippine socio-political events, infrastructure dilemmas, macro-economic realities, and pop-culture phenomena through the lens of early-2000s **Ragnarok Online (Gravity / Level Up! Games)** patch notes, server status bulletins, and community forums.
+
+By re-framing the country as a massive, chaotic, high-ping MMORPG sandbox ("Republic Server Ver 7107.25"), *Midgarts PH* delivers sharp social commentary wrapped in pixel-nostalgic UI, authentic game mechanics, and relatable Filipino cultural tropes.
+
+---
+
+### 2. Core Themes & Creative Metaphors
+
+| Real-World Phenomenon | In-Game MMORPG Translation |
+| :--- | :--- |
+| **7,107 Islands & Regional Diversity** | Sharded Realms (`Luzon-01`, `Visayas-Archipelago`, `Mindanao-SouthGate`) |
+| **EDSA Traffic, Commuter Struggles & MRT Breakdowns** | Severe debuffs to Acolyte *Agility Up*, Merchant cart overload penalties, EDSA Carousel zone lag |
+| **PUV / Jeepney Modernization Program** | Forced class upgrade to *Euro-4 Modern Mado Carts*, franchise permits, anti-Colorum GM patrols |
+| **Agri-Inflation & Food Smuggling (Onions, Rice)** | Exploitative *Golden Sibuyas* market hoarding, Subic Port cold-storage dungeon raids, price caps on *Sinangag* |
+| **Philippine Heat Index & El Niño** | 44°C environmental heat debuff; introduction of *Halo-Halo* consumable buff (+50 Heat Resist) |
+| **Utility Outages (Meralco, Maynilad)** | Rolling blackouts degrading Alchemist potion brewing; mandatory collection of blue water drums (*Timba at Tabo*) |
+| **P-Pop Wave & BINI Craze** | Synchronized party emote `/pantropiko` (+5 ASPD, +10% party morale), limited-edition *Cherry On Top* headgear |
+| **LTO Fixers & Red Tape** | *Judicial GM Ban Logs* sanctioning unauthorized guild fixers, counterfeit Cart Driver Licenses, RFID scalpers |
+
+---
+
+### 3. Target Audience & Personas
+
+1. **The Millennial Ex-RO Grinder (Ages 28–42)**
+   - Nostalgic gamers who spent their youth in internet cafes (*lanshop* era, 2002–2010), familiar with RO sound effects, Kafra ladies, and Zeny grinds.
+2. **The Modern Commuter & Social Observer (Ages 20–35)**
+   - Daily MRT/bus commuters and netizens who engage with Philippine satirical pages (e.g., *The Professional Heckler*, satire meme communities).
+3. **Game Designers & UI/UX Engineers**
+   - Appreciators of retro-skeuomorphic UI design, 2000s desktop OS window chrome, and contextual lore-building.
+
+---
+
+### 4. System Architecture & Key Modules
+
+```
+[ Midgarts PH Web Experience ]
+ ├── Global Realm Banner & Clock
+ │    ├── Philippine Standard Time (PST/PHT)
+ │    ├── Server State (Luzon: Flood Drill | Visayas: Island Hop | Mindanao: High Ping)
+ │    └── Active BGM Selector (Prontera Theme - Jeepney Bassboost Remix)
+ ├── Emergency Red Alert Dispatch
+ │    └── Dynamic Server Downtime & Emergency Commuter Debuff Broadcast
+ ├── Main RO Window Client (Desktop App Chrome: Min/Max/Close)
+ │    ├── Episode Patch Notes Feed (Categorized by Infrastructure, Economy, Balance)
+ │    ├── Skill & Stat Rebalance Breakdown
+ │    └── New Consumable & Headgear Catalog
+ ├── Side Rail Modules
+ │    ├── Macro-Economy & Zeny Index (Jollibee Chickenjoy Parity, OFW Remittance rate)
+ │    ├── Kafra Staff Service Desk (Ate Leina NPC dialogue & advice)
+ │    └── Judicial GM Sanctions & Ban Log (Real-world red tape / fixer arrests)
+ └── Footer Legal & Disclaimer
+      └── Parody NPC terms, Barangay Ordinances, Anti-Bot Law & Kafra Code of Ethics
+```
+
+---
+
+### 5. Detailed Feature Specifications
+
+#### 5.1. Patch Note Structure
+- **Format**: `[Tag] Topic: Real World Event Translated Into RO Mechanics`
+- **Changelog Attributes**:
+  - *Affected Classes*: (e.g., Merchant, Acolyte, Novice, Bard/Dancer)
+  - *Stat Multipliers*: Numeric buffs/nerfs (e.g., `-15% HP`, `+20 LUK`, `Cooldown +5s`)
+  - *GM Dev Notes*: Satirical commentary explaining the design rationale.
+
+#### 5.2. Visual & Audio Design Direction
+- **Typography**: EB Garamond paired with monospace system fonts (Courier/Consolas) and classic pixel-style serif/sans accents.
+- **Palette**:
+  - *Parchment Surface*: `#FFF9ED` / `#FAF3E3` (RO quest window parchment)
+  - *Navy Chrome*: `#2B5B84` / `#1A3A54` (RO client title bar & border)
+  - *Alert Red*: Crimson `#8B1E2D` (Maintenance & urgent banner warnings)
+  - *Gold Accents*: `#D4A346` (Zeny counters, special drops, MVP notifications)
+- **UI Skeuomorphism**: Beveled buttons, inset panels, classic retro window minimize/maximize/close icons, pixelated badge chips.
+
+#### 5.3. Interactivity & Micro-Interactions
+- Expandable patch sections with toggleable GM commentary.
+- Live soundboard triggers (e.g., iconic RO leveling chime, failed refine sound, Kafra greeting).
+- Filterable patch categories: `All`, `Transport & Commute`, `Agri-Economy`, `Pop Culture & Events`, `Judicial / Ban Logs`.
+
+---
+
+### 6. Roadmap & Future Scope
+
+- **Phase 1 (Completed)**: MVP Launch — Portal Screen UI (`{{DATA:SCREEN:SCREEN_2}}`) featuring Episode 7107.25 patch notes, GM logs, and PH macro indices.
+- **Phase 2 (Next)**:
+  - *Class & Skill Balance Deep-Dive Screen*: Detailed tab for each job class (e.g., BPO Night-Shift Assassin Cross, Barangay Captain Knight).
+  - *Kafra Shop News & Gacha Catalog*: Satirical paid cosmetics and consumable items.
+  - *Interactive Sound Effects Engine*: RO audio cues for button clicks and alert tickers.
+- **Phase 3**:
+  - Community Submission Portal ("Report a National Server Bug / Exploit to GMs").
+  - Mobile-responsive view optimized for smartphone screens.
+
+---
+
+### 7. Content Guidelines & Compliance
+- **Satire Disclaimer**: Clear and persistent footer disclaimers clarifying that the site is an artistic parody and not an official service of Gravity Co., Ltd., Level Up! Games, or Philippine government agencies.
+- **Safety**: Purely humorous commentary on public infrastructure, traffic, and collective cultural experiences without hate speech or defamation.

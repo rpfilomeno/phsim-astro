@@ -1,0 +1,49 @@
+---
+const legalLinks = [
+  'TERMS OF BARANGAY SERVICE',
+  'PRIVACY NOTICE (NPC)',
+  'ANTI-BOT LAW',
+  'KAFRA CODE OF ETHICS',
+];
+---
+
+<footer class="w-full bg-surface-container-low border-t border-surface-container py-space-xl">
+  <div
+    class="max-w-[1280px] mx-auto px-gutter md:px-gutter-desktop flex flex-col gap-space-lg"
+  >
+    <div class="flex flex-col md:flex-row items-start justify-between gap-space-lg">
+      <div class="flex flex-col gap-space-xs">
+        <div class="flex flex-wrap items-center gap-space-sm">
+          <span class="font-headline-md text-title-md text-primary font-bold"
+            >Midgarts PH Chronicle</span
+          >
+          <span
+            class="px-1.5 py-0.5 rounded bg-secondary-fixed text-on-secondary-fixed font-label-badge text-label-badge"
+            >REPUBLIC SERVER VER 7107.25</span
+          >
+        </div>
+        <p class="font-body-sm text-body-sm text-on-surface-variant max-w-2xl">
+          DOTr &amp; DTI Registered. Gravity &amp; Kafra Philippines Corporation © 2002-2025. All
+          real-world traffic, weather, and commodity price spikes calibrated for Pinoy gaming
+          sanity. Poring drops are subject to Bureau of Customs clearance.
+        </p>
+      </div>
+      <ul class="flex flex-wrap items-center gap-space-md text-on-surface-variant font-label-data text-label-data">
+        {legalLinks.map((link) => <li>{link}</li>)}
+      </ul>
+    </div>
+
+    <div class="border-t border-surface-container pt-space-md">
+      <p class="font-body-sm text-body-sm text-on-surface-variant max-w-4xl">
+        <span class="font-label-badge text-label-badge text-tertiary uppercase font-bold mr-1"
+          >Satire disclaimer:</span
+        >
+        Midgarts PH is an artistic parody and an unofficial fan project. It is not affiliated with,
+        endorsed by, or operated by Gravity Co., Ltd., Level Up! Games, any Philippine government
+        agency, or any company or artist named on this page. All "patch notes", server statuses,
+        prices, and NPC dialogue are humour about shared public experiences, not statements of fact
+        or accusations against any person. No hate speech, no defamation, no real Zeny.
+      </p>
+    </div>
+  </div>
+</footer>

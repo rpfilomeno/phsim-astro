@@ -1,0 +1,131 @@
+---
+import KafraPortrait from './KafraPortrait.astro';
+
+const navItems = [
+  { href: '#patch-log', label: 'Main Patch Notes', current: true },
+  { href: '#macro', label: 'Macro-Economy' },
+  { href: '#maintenance', label: 'Maintenance Log' },
+  { href: '#gvg', label: 'GvG Bulletin' },
+  { href: '#gm-log', label: 'GM Log' },
+];
+---
+
+<header class="static lg:sticky top-0 z-50 bg-surface shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+  <a href="#patch-log" class="skip-link">Skip to patch notes</a>
+  <div
+    class="max-w-[1280px] mx-auto px-gutter md:px-gutter-desktop flex flex-col gap-space-xs py-space-xs"
+  >
+    <div
+      class="flex flex-wrap items-center justify-between gap-space-sm border-b border-surface-variant pb-space-xs"
+    >
+      <div class="flex flex-wrap items-center gap-space-sm min-w-0">
+        <span
+          class="inline-flex items-center px-space-xs py-0.5 rounded bg-primary-container text-on-primary font-label-badge text-label-badge uppercase tracking-wider shrink-0"
+          >REALM BULLETIN</span
+        >
+        <ul
+          class="flex flex-wrap items-center gap-x-space-md gap-y-1 font-label-data text-label-data text-on-surface-variant"
+        >
+          <li class="flex items-center gap-1 whitespace-nowrap">
+            Luzon <span class="text-error font-bold">[MAINTENANCE - FLOOD DRILL]</span>
+          </li>
+          <li class="flex items-center gap-1 whitespace-nowrap">
+            Visayas <span class="text-secondary font-bold">[OVERCROWDED - ISLAND HOP]</span>
+          </li>
+          <li class="flex items-center gap-1 whitespace-nowrap">
+            Mindanao <span class="text-tertiary font-bold">[HIGH PING / WARP GATE UNSTABLE]</span>
+          </li>
+        </ul>
+      </div>
+      <p class="font-label-badge text-label-badge text-on-surface-variant uppercase">
+        Philippine Standard Time:
+        <time id="pht-clock" class="text-on-surface font-bold" datetime="">--:--:-- PHT</time>
+      </p>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-space-md pb-space-xs">
+      <a href="/" class="flex items-center gap-space-md min-w-0">
+        <svg class="h-8 w-8 shrink-0" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+          <rect width="32" height="32" rx="2" fill="#09436b"></rect>
+          <rect x="3" y="3" width="26" height="26" fill="none" stroke="#ffe088" stroke-width="1"
+          ></rect>
+          <text
+            x="16"
+            y="23"
+            text-anchor="middle"
+            font-family="EB Garamond, Georgia, serif"
+            font-size="19"
+            font-weight="700"
+            fill="#ffe088">M</text
+          >
+        </svg>
+        <span class="flex flex-col min-w-0">
+          <span class="font-headline-md text-headline-md text-primary leading-none"
+            >Midgarts PH Chronicle</span
+          >
+          <span
+            class="hidden sm:block font-label-badge text-label-badge text-secondary leading-tight uppercase tracking-wider"
+            >Republic Server Official Patch &amp; Maintenance Registry</span
+          >
+        </span>
+      </a>
+
+      <nav
+        aria-label="Registry sections"
+        class="order-3 w-full xl:order-none xl:w-auto flex items-center gap-space-xs bg-surface-container-high p-0.5 rounded overflow-x-auto"
+      >
+        {
+          navItems.map((item) => (
+            <a
+              href={item.href}
+              aria-current={item.current ? 'location' : undefined}
+              class:list={[
+                'px-space-sm py-1 rounded transition-colors whitespace-nowrap',
+                item.current
+                  ? 'bg-primary text-on-primary font-bold shadow-inner'
+                  : 'text-on-surface-variant hover:text-on-surface font-title-md text-body-sm',
+              ]}
+            >
+              {item.label}
+            </a>
+          ))
+        }
+      </nav>
+
+      <a
+        href="#kafra"
+        class="hidden sm:flex items-center gap-space-sm shrink-0 bg-surface-container-low px-space-sm py-1 rounded border border-surface-container hover:border-outline-variant transition-colors"
+      >
+        <span class="flex flex-col text-right">
+          <span class="font-title-md text-body-sm text-on-surface leading-tight">Ate Leina</span>
+          <span class="font-label-badge text-label-badge text-on-surface-variant"
+            >Kafra · Ortigas</span
+          >
+        </span>
+        <KafraPortrait class="w-8 h-8 rounded object-cover ring-1 ring-secondary" />
+      </a>
+    </div>
+  </div>
+</header>
+
+<script>
+  const clock = document.getElementById('pht-clock');
+  const formatter = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Asia/Manila',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  });
+
+  const tick = () => {
+    const now = new Date();
+    if (clock) {
+      clock.textContent = `${formatter.format(now)} PHT`;
+      clock.setAttribute('datetime', now.toISOString());
+    }
+  };
+
+  tick();
+  setInterval(tick, 1000);
+</script>

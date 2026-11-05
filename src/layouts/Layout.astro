@@ -1,0 +1,49 @@
+---
+import '../styles/global.css';
+import RealmHeader from '../components/RealmHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Midgarts PH: The Pearl Archipelago - Republic Server Patch & Maintenance Registry',
+  description = 'Satirical Ragnarok-style patch notes, server status bulletins, and GM logs for the Philippine Republic Server Ver 7107.25. A parody fan project.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#09436b" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@600;700&family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="bg-surface font-body-md text-on-surface antialiased selection:bg-secondary selection:text-on-secondary"
+  >
+    <RealmHeader />
+    <main id="main" class="w-full bg-surface min-h-[calc(100vh-140px)]">
+      <div class="max-w-[1280px] mx-auto px-gutter md:px-gutter-desktop py-space-lg">
+        <slot />
+      </div>
+    </main>
+    <SiteFooter />
+  </body>
+</html>

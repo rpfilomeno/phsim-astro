@@ -1,0 +1,185 @@
+---
+import KafraPortrait from './KafraPortrait.astro';
+
+const sanctions = [
+  {
+    player: 'Player: [Fixer_Sa_LTO_01]',
+    penalty: 'PERM BAN',
+    infraction:
+      "Selling fake Merchant Cart Driver's Licenses and Cart Registrations outside Tayuman Station.",
+  },
+  {
+    player: 'Player: [Smuggled_Frozen_Carrots]',
+    penalty: 'BAN: 60 DAYS',
+    infraction:
+      'Illicit smuggling of agricultural goods through Batangas port without phytosanitary clearance.',
+  },
+  {
+    player: 'Guild: [Tollway_RFID_Scalpers]',
+    penalty: 'PENALTY -10M Z',
+    infraction:
+      'Auto-deducting toll zeny with malfunctioning RFID sensors at SLEX expressway portals.',
+  },
+];
+---
+
+<aside class="flex flex-col gap-space-lg" aria-label="Server telemetry and service desk">
+  <section
+    id="kafra"
+    class="bg-surface-container rounded shadow-md overflow-hidden"
+    aria-labelledby="kafra-title"
+  >
+    <div class="bg-tertiary text-on-tertiary px-space-md py-1.5 flex items-center justify-between">
+      <div class="flex items-center gap-space-xs font-title-md text-body-sm font-bold">
+        <h2 id="kafra-title">Kafra Staff Service Desk PH</h2>
+      </div>
+      <span class="font-label-badge text-label-badge bg-tertiary-container text-on-tertiary px-1.5 py-0.5 rounded"
+        >BRANCH #04</span
+      >
+    </div>
+    <div class="p-space-md bg-surface-container-lowest flex gap-space-md items-start">
+      <KafraPortrait class="w-16 h-16 rounded shrink-0 shadow-sm" />
+      <div class="flex flex-col gap-space-xs">
+        <div class="flex flex-wrap items-center justify-between gap-space-xs">
+          <span class="font-title-md text-body-md text-primary font-bold">Staff Ate Leina</span>
+          <span class="font-label-badge text-label-badge text-secondary font-semibold"
+            >Makati / BGC Booth</span
+          >
+        </div>
+        <p
+          lang="tl"
+          class="p-space-xs bg-surface-container-low rounded font-body-sm text-body-sm text-on-surface leading-tight"
+        >
+          "Mabuhay! Welcome to Kafra Services PH! Reminding all adventurers to bring exact barya
+          for cart storage and beware of snatchers near the Quiapo Church save point!"
+        </p>
+        <div class="flex flex-wrap gap-space-xs mt-1">
+          <a
+            href="#macro"
+            class="px-space-xs py-0.5 bg-surface-container-high hover:bg-surface-container text-on-surface font-label-badge text-label-badge rounded"
+            >Check Cart</a
+          >
+          <a
+            href="#maintenance"
+            class="px-space-xs py-0.5 bg-primary text-on-primary font-label-badge text-label-badge rounded"
+            >Save Point (Balikbayan)</a
+          >
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section
+    id="macro"
+    class="bg-surface-container rounded shadow-md overflow-hidden"
+    aria-labelledby="macro-title"
+  >
+    <div class="bg-primary-container text-on-primary px-space-md py-1.5 flex items-center justify-between">
+      <h2 id="macro-title" class="font-title-md text-body-sm font-bold">PH Realm Macro-Economy Index</h2>
+      <span class="font-label-badge text-label-badge text-secondary-fixed">LIVE TICKER</span>
+    </div>
+    <div class="p-space-md bg-surface-container-lowest flex flex-col gap-space-sm font-body-sm text-body-sm">
+      <div class="flex items-center justify-between gap-space-sm p-space-xs bg-surface-container-low rounded">
+        <div class="flex flex-col">
+          <span class="font-semibold text-on-surface">Chibog / Jollibee Chickenjoy Parity</span>
+          <span class="font-body-sm text-on-surface-variant">Fast-Food Consumer Index</span>
+        </div>
+        <span class="font-label-data text-label-data text-error font-bold text-right">+7.2% YoY ↑</span>
+      </div>
+      <div class="flex items-center justify-between gap-space-sm p-space-xs bg-surface-container-low rounded">
+        <div class="flex flex-col">
+          <span class="font-semibold text-on-surface">USD to Zeny Remittance Rate</span>
+          <span class="font-body-sm text-on-surface-variant">OFW Palay Guild Ticker</span>
+        </div>
+        <span class="font-label-data text-label-data text-tertiary font-bold text-right">$1 = 58.85 Z</span>
+      </div>
+      <div class="flex items-center justify-between gap-space-sm p-space-xs bg-surface-container-low rounded">
+        <div class="flex flex-col">
+          <span class="font-semibold text-on-surface">Daily Minimum Zeny Wage</span>
+          <span class="font-body-sm text-on-surface-variant">NCR vs Provincial Disparity</span>
+        </div>
+        <div class="text-right font-label-badge text-label-badge text-primary">
+          <span class="block">NCR: 610 Z / day</span>
+          <span class="block text-secondary">Provincial: 435 Z</span>
+        </div>
+      </div>
+      <div class="p-space-xs bg-surface-container rounded flex flex-col gap-1">
+        <span class="font-label-badge text-label-badge text-on-surface-variant uppercase"
+          >Angat Dam Water Level: 178.4m</span
+        >
+        <div
+          class="w-full bg-surface-variant h-3 rounded-full overflow-hidden flex"
+          role="img"
+          aria-label="Angat Dam at 178.4 metres against a 180 metre threshold: critical shortfall zone"
+        >
+          <div class="bg-primary h-full w-[45%]" title="Live Water Capacity"></div>
+          <div class="bg-secondary h-full w-[35%]" title="Silt Inflow"></div>
+          <div class="bg-error h-full w-[20%]" title="Critical Shortfall Zone"></div>
+        </div>
+        <div class="flex justify-between font-label-badge text-label-badge text-on-surface-variant pt-0.5">
+          <span>Current 178.4m</span>
+          <span>Threshold 180m</span>
+          <span class="text-error font-bold">Deficit Alert</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section
+    id="gvg"
+    class="bg-surface-container rounded shadow-md overflow-hidden"
+    aria-labelledby="gvg-title"
+  >
+    <div class="bg-secondary text-on-secondary px-space-md py-1.5 flex items-center justify-between gap-space-sm">
+      <h2 id="gvg-title" class="font-title-md text-body-sm font-bold">War of Emperium &amp; Barangay Elections</h2>
+      <span class="font-label-badge text-label-badge bg-secondary-fixed text-on-secondary-fixed px-1.5 py-0.5 rounded shrink-0"
+        >GvG ACT #71</span
+      >
+    </div>
+    <div class="p-space-md bg-surface-container-lowest flex flex-col gap-space-sm">
+      <div class="flex flex-col">
+        <span class="font-title-md text-body-sm text-primary font-bold"
+          >Agit Siege: Fort Santiago &amp; Malacañang Grounds</span
+        >
+        <span class="font-label-data text-label-data text-on-surface-variant"
+          >Scheduled: Sunday 20:00 - 22:00 PHT</span
+        >
+      </div>
+      <div class="p-space-sm bg-surface-container-low rounded flex flex-col gap-space-xs">
+        <span class="font-label-badge text-label-badge text-tertiary uppercase font-bold"
+          >Senate Blue Ribbon &amp; Antitrust Probe</span
+        >
+        <p class="font-body-sm text-body-sm text-on-surface leading-tight">
+          Political dynasties and warlord guild coalitions face congressional subpoena. The joint
+          siege of Northern Dynasties and Southern Clans over 3 consecutive Agits is declared ultra
+          vires under Republic Anti-Monopoly decrees.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section
+    id="gm-log"
+    class="bg-surface-container rounded shadow-md overflow-hidden"
+    aria-labelledby="gm-log-title"
+  >
+    <div class="bg-inverse-surface text-inverse-on-surface px-space-md py-1.5 flex items-center justify-between">
+      <h2 id="gm-log-title" class="font-title-md text-body-sm font-bold">Judicial Hall GM Log</h2>
+      <span class="font-label-badge text-label-badge text-error-container">PH SANCTIONS</span>
+    </div>
+    <div class="p-space-md bg-surface-container-lowest flex flex-col gap-space-xs font-body-sm text-body-sm">
+      {
+        sanctions.map((entry) => (
+          <div class="p-space-xs bg-surface-container-low rounded flex flex-col">
+            <div class="flex flex-wrap justify-between gap-space-xs font-label-data text-label-data text-error font-bold">
+              <span>{entry.player}</span>
+              <span>{entry.penalty}</span>
+            </div>
+            <p class="text-on-surface mt-0.5">Infraction: {entry.infraction}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+</aside>
+

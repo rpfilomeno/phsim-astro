@@ -1,0 +1,62 @@
+---
+---
+
+<section
+  id="maintenance"
+  aria-label="Emergency server notice"
+  class="mb-space-md p-space-sm bg-tertiary-container text-on-tertiary rounded shadow-sm flex flex-col md:flex-row items-center justify-between gap-space-sm"
+>
+  <div class="flex items-center gap-space-sm">
+    <span
+      class="inline-flex items-center justify-center w-6 h-6 bg-error text-on-error rounded font-label-badge text-label-badge motion-safe:animate-pulse shrink-0"
+      aria-hidden="true">!</span
+    >
+    <div class="flex flex-col">
+      <p class="font-title-md text-body-md text-on-tertiary leading-snug">
+        [EMERGENCY NOTICE] MRT-3 Line Server Crash &amp; EDSA Carousel Traffic Debuff
+      </p>
+      <p class="font-body-sm text-body-sm text-on-tertiary-container">
+        All Acolyte Agility Up / Increase AGI buffs are suppressed during peak rush hours
+        (07:00 ~ 09:30 PHT). Commuter Merchant carts exceeding 50% capacity suffer a severe
+        movement slow debuff.
+      </p>
+    </div>
+  </div>
+  <div class="flex items-center gap-space-md bg-tertiary px-space-md py-1 rounded shrink-0">
+    <span
+      id="countdown-label"
+      class="font-label-badge text-label-badge text-on-tertiary-container uppercase tracking-wider"
+      >Next Weekly Reboot In</span
+    >
+    <span
+      id="countdown-timer"
+      class="font-label-data text-label-data text-secondary-fixed font-bold tracking-widest tabular-nums"
+      >--h : --m : --s</span
+    >
+  </div>
+</section>
+
+<script>
+  import { formatRemaining, rebootWindow } from '../lib/reboot';
+
+  const timer = document.getElementById('countdown-timer');
+  const label = document.getElementById('countdown-label');
+
+  const render = () => {
+    const now = Date.now();
+    const { start, end } = rebootWindow(now);
+
+    if (!timer || !label) return;
+
+    if (now >= start) {
+      label.textContent = 'Reboot Window Closes In';
+      timer.textContent = formatRemaining(end - now);
+    } else {
+      label.textContent = 'Next Weekly Reboot In';
+      timer.textContent = formatRemaining(start - now);
+    }
+  };
+
+  render();
+  setInterval(render, 1000);
+</script>
