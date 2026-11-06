@@ -1,14 +1,14 @@
 ---
 slug: entire-sk-council-in-sarangani-resigns-over-canceled-polls
 tag: SERVER POLITICS
-title: Entire Sarangani SK Guild Quits After GM Cancels Server Polls Event
-summary: Following the abrupt cancellation of localized server elections, an
-  entire Sangguniang Kabataan council in Sarangani officially drops their guild
-  roles and resigns en masse.
+title: Sarangani SK Guild Roster Rages Quit After GM Cancels Event Quests
+summary: An entire Sangguniang Kabataan council in Sarangani has dropped their
+  guild badges and resigned following the abrupt cancellation of local electoral
+  events.
 headline: Entire SK council in Sarangani resigns over canceled polls
 url: https://newsinfo.inquirer.net/2336850/entire-sk-council-in-sarangani-resigns-over-canceled-polls
-publishedAt: 2026-11-06T04:30:28.506Z
-generatedAt: 2026-11-06T04:31:24.119Z
+publishedAt: 2026-11-06T04:43:12.644Z
+generatedAt: 2026-11-06T04:44:48.966Z
 ---
 
-Following the abrupt cancellation of localized server elections, an entire Sangguniang Kabataan council in Sarangani officially drops their guild roles and resigns en masse.
+An entire Sangguniang Kabataan council in Sarangani has dropped their guild badges and resigned following the abrupt cancellation of local electoral events.

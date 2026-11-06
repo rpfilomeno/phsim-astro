@@ -1,28 +1,28 @@
 ---
-generatedAt: 2026-11-06T04:32:05.216Z
+generatedAt: 2026-11-06T04:45:33.874Z
 notice:
-  headline: "[EMERGENCY NOTICE] Fatal Iligan City Fire Wipes Out P900K Gear"
-  body: A devastating fire in Iligan City resulted in 2 player casualties and
-    wiped out P900K in properties, triggering urgent guild and rescue responses.
+  headline: "[EMERGENCY NOTICE] Iligan City Fire Hazard Triggers Fatal Structural Wipe"
+  body: A devastating fire event in Iligan City destroyed P900,000 in structural
+    durability and resulted in 2 player casualties. Avoid the fire hazard zone!
 sanctions:
-  - player: "Player: Iligan_Crafting_Guild"
+  - player: "Guild: Iligan_Firecracker_Crafters"
     penalty: PERM BAN
-    infraction: Operating an unregistered firecracker crafting shop that resulted in
-      a fatal illegal item synthesis explosion.
+    infraction: Unauthorized hazardous crafting at an unregistered firecracker
+      station led to a fatal explosion and server safety violations.
 gvg:
-  title: Palace Casts Instant Veto Skill on Budget Red Flags
-  label: PALACE BUDGET VETO
-  body: GM Marcos threatens another swift veto skill cast if guild leaders slip
-    suspicious items past the national budget audit. Finance experts warn that
-    unchecked fiscal crafting could trigger severe server-wide economic debuffs
-    before the next WoE patch.
+  title: Palace Threatens Swift Veto Hammer on Suspicious Guild Ledgers
+  label: BUDGET SIEGE ALERT
+  body: Guild leaders have been warned by the Palace that any suspicious items and
+    budget red flags spotted in the ledger will face an immediate veto hammer
+    from GM Marcos. This strict audit policy serves as a reminder that
+    unauthorized loot and shady item synthesis will trigger server-wide wipes.
 realmStatuses:
   - region: Luzon
-    status: "[PRAYERS FOR RAIN BUFF]"
+    status: "[PRAYING FOR RAIN DEBUFF]"
   - region: Visayas
-    status: "[NEW CHIEF JUSTICE EQUIPPED]"
+    status: "[BUDGET VETO HAMMER READY]"
   - region: Mindanao
-    status: "[UNREGISTERED FIRECRACKER EXPLOSION]"
+    status: "[GUILD PROTECTION REVOKED]"
 macro:
   usdRate: 62.995
   usdDate: 2026-11-05
@@ -50,6 +50,14 @@ history:
     political landscape of the Philippines during the Marcos era and beyond.
   url: https://kahimyang.com/articles/3166/today-in-filipino-history-november-6-1915-nicanor-y-iguez-was-born-in-maasin-leyte
 quakes:
+  - time: 06 November 2026 - 12:27 PM
+    lat: "05.35"
+    lon: "125.26"
+    depth: "033"
+    mag: "1.9"
+    location: 019 km S 70° W of Balut Island (Municipality Of Sarangani) (Davao
+      Occidental)
+    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_042732_B1F.html
   - time: 06 November 2026 - 11:08 AM
     lat: "05.49"
     lon: "125.16"
@@ -115,13 +123,6 @@ quakes:
     mag: "2.2"
     location: 030 km N 74° W of Kalamansig (Sultan Kudarat)
     url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1105_222148_B1.html
-  - time: 06 November 2026 - 05:56 AM
-    lat: "17.28"
-    lon: "119.86"
-    depth: "013"
-    mag: "3.0"
-    location: 063 km N 79° W of City Of Candon (Ilocos Sur)
-    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1105_215655_B2.html
 stocks:
   gainer:
     ticker: PHES

@@ -1,31 +1,30 @@
 ---
 category: environment
-tag: CLIMATE BUFF
+tag: ENVIRONMENT
 tagClass: bg-surface-container text-on-surface
 code: BALANGA-MANGROVE
-title: Balanga Mangrove Forest Sector Patched; High-Tier Eco-Shield Activated
-  Against Tidal Surges
-body: Server developers have reinforced the coastal boundaries of Balanga with
-  dense mangrove flora, granting permanent damage reduction against incoming
-  water element attacks. Local fisherfolk classes report a stable drop rate for
-  coastal catches within these protected zones.
+title: Balanga Mangrove Forest Sector Patched; High-Tier Natural Defense Shield
+  Active Against Floods
+body: Developers have boosted the ecological durability of Balanga's mangrove
+  forest sector, providing local fisherfolk guilds with a reliable buffer
+  against coastal flooding. This natural barrier successfully neutralizes tidal
+  wave hazards while maintaining steady daily loot drops for aquatic gatherers.
 classes:
   - Merchant
-  - Novice
   - Super Novice
+  - Archer
 stats:
-  - label: Tidal Damage Mitigation
-    value: +50% Water Resistance
-    note: Applies exclusively to coastal zones
+  - label: Flood Damage Reduction
+    value: +85% Resistance
+    note: Applies to coastal residential zones
     tone: primary
-  - label: Catch Yield
-    value: +25% Rare Fish Drop
-    note: Fisherfolk passive bonus active
+  - label: Fisher Guild Loot Yield
+    value: +25% Daily Catch
+    note: Includes Tilapia and Bangus rare drops
     tone: primary
-notice: Cutting down mangrove roots for charcoal crafting will trigger instant
-  GM banhammer action.
-gmNote: Protect our natural spawns so we don't keep wiping during rainy season.
-  - GM_Lola_Rosa
+notice: Cutting down mangrove trees for charcoal will result in an instant
+  30-day jail debuff from DENR wardens.
+gmNote: Protect your green zones, players! Nature is your best armor set. - GM_Bayani
 ---
 
-Server developers have reinforced the coastal boundaries of Balanga with dense mangrove flora, granting permanent damage reduction against incoming water element attacks. Local fisherfolk classes report a stable drop rate for coastal catches within these protected zones.
+Developers have boosted the ecological durability of Balanga's mangrove forest sector, providing local fisherfolk guilds with a reliable buffer against coastal flooding. This natural barrier successfully neutralizes tidal wave hazards while maintaining steady daily loot drops for aquatic gatherers.

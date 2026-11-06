@@ -21,6 +21,12 @@ Built with Astro 7 and Tailwind CSS 4. Single static page, no client framework.
 Copy `.env.example` to `.env` and fill in `GEMINIKEYS` (comma-separated Gemini API keys) and
 `FIRECRAWL_API_KEY`. Then run `npm run generate:site`.
 
+## Deploy
+
+The site deploys to GitHub Pages via `.github/workflows/deploy.yml`. Add `GEMINIKEYS` and
+`FIRECRAWL_API_KEY` as repository secrets. The workflow runs the generator (prebuild) then
+builds and deploys. Set `BASE_PATH` env var if deploying to a subpath.
+
 ## Structure
 
 ```text

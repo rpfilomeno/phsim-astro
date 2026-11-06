@@ -1,14 +1,14 @@
 ---
 slug: mnlf-faction-says-dela-rosa-not-under-its-protection
-tag: SERVER POLITICS
-title: MNLF Faction Declares Dela Rosa Lacks Guild Sanctuary and Protection Buff
-summary: An MNLF faction has clarified that Senator Bato dela Rosa is not under
-  its territory's protection buff. Guild leaders emphasized that no official
-  safe-zone alliance or sanctuary exists for the lawmaker within their camp.
+tag: GUILD POLITICS
+title: MNLF Faction Clarifies Bato Dela Rosa Lacks Guild Sanctuary Buff
+summary: An MNLF faction announced that Senator Ronald 'Bato' dela Rosa is not
+  currently enrolled under its guild protection or sanctuary buffs within the
+  server.
 headline: MNLF faction says Dela Rosa not under its protection
 url: https://newsinfo.inquirer.net/2335043/mnlf-faction-says-dela-rosa-not-under-its-protection
-publishedAt: 2026-11-06T04:30:26.617Z
-generatedAt: 2026-11-06T04:31:24.119Z
+publishedAt: 2026-11-06T04:43:10.825Z
+generatedAt: 2026-11-06T04:44:48.966Z
 ---
 
-An MNLF faction has clarified that Senator Bato dela Rosa is not under its territory's protection buff. Guild leaders emphasized that no official safe-zone alliance or sanctuary exists for the lawmaker within their camp.
+An MNLF faction announced that Senator Ronald 'Bato' dela Rosa is not currently enrolled under its guild protection or sanctuary buffs within the server.

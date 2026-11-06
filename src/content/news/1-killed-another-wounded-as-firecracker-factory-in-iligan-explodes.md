@@ -1,14 +1,13 @@
 ---
 slug: 1-killed-another-wounded-as-firecracker-factory-in-iligan-explodes
 tag: CRAFTING ACCIDENT
-title: Illegal Alchemist Bomb Misfire in Iligan Zone Leaves 1 Dead, 1 Wounded
-summary: An accidental detonation at an unregistered firecracker crafting shop
-  in Iligan resulted in 1 casualty and 1 wounded player. Local GMs are
-  investigating the illegal item synthesis.
+title: Alchemist Crafting Disaster in Iligan Leaves One Dead and Another Wounded
+summary: A fatal explosion at a firecracker crafting station in Iligan resulted
+  in 1 casualty and 1 injury as volatile item synthesis went wrong.
 headline: 1 killed, another wounded as firecracker ‘factory’ in Iligan explodes
 url: https://newsinfo.inquirer.net/2336860/1-killed-another-wounded-as-firecracker-factory-in-iligan-explodes
-publishedAt: 2026-11-06T04:30:26.996Z
-generatedAt: 2026-11-06T04:31:24.119Z
+publishedAt: 2026-11-06T04:43:11.190Z
+generatedAt: 2026-11-06T04:44:48.966Z
 ---
 
-An accidental detonation at an unregistered firecracker crafting shop in Iligan resulted in 1 casualty and 1 wounded player. Local GMs are investigating the illegal item synthesis.
+A fatal explosion at a firecracker crafting station in Iligan resulted in 1 casualty and 1 injury as volatile item synthesis went wrong.
