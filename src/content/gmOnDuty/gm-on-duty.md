@@ -1,5 +1,5 @@
 ---
-name: GM Kuya
+name: GM JELai
 role: GM on Duty
 avatar: kafra_ate_leina
 location: Ortigas Station
