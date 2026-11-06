@@ -37,6 +37,39 @@ Custom domain: `phsim.rogverse.fyi` (see `public/CNAME`). Point a DNS CNAME reco
 `rpfilomeno.github.io`, then set the custom domain under Settings → Pages. The site is served
 from the domain root, so no `BASE_PATH` is needed.
 
+### Alternative: build+push via Dokploy (Docker)
+
+`Dockerfile` + `docker-entrypoint.sh` provide a fully parallel path that leaves `.github`
+untouched: the container regenerates data, builds `dist/`, and force-pushes it to another
+GitHub repo's `gh-pages` branch, repeating every `PUSH_INTERVAL_HOURS` (default 24; `0` =
+run once and exit).
+
+Env vars (define in `.env` for local runs; mirror them into Dokploy's app environment —
+`.env` is gitignored, so Dokploy cannot read it from the repo):
+
+| Variable | Purpose |
+| -------- | ------- |
+| `DEPLOY_REPO` | Target repo, e.g. `owner/other-repo` (pushes its `gh-pages` branch) |
+| `GITHUB_TOKEN` | Fine-grained PAT with `contents: write` on the target repo |
+| `PUSH_INTERVAL_HOURS` | Hours between rebuild+push cycles (default 24, `0` = one-shot) |
+| `GEMINIKEYS`, `FIRECRAWL_API_KEY`, `NASA_API_KEY` | Same as `.env.example` |
+
+Local run (build once, no push if `DEPLOY_REPO`/`GITHUB_TOKEN` are absent):
+
+```sh
+docker build -t phsim-builder .
+docker run --rm --env-file .env -e PUSH_INTERVAL_HOURS=0 phsim-builder
+```
+
+Dokploy: create an app from this repo, build method **Dockerfile**, paste the env vars above,
+expose no port (it is a long-running task, not a server), and keep the container running —
+the entrypoint's sleep loop is the schedule.
+
+One-time on the target repo: create it, enable Pages with source = `gh-pages` branch.
+
+`scripts/phivolcs-ca.pem` is a public GlobalSign intermediate that completes PHIVOLCS's
+incomplete certificate chain inside the container (via `NODE_EXTRA_CA_CERTS`).
+
 ## Structure
 
 ```text
