@@ -1,28 +1,29 @@
 ---
-generatedAt: 2026-11-06T04:45:33.874Z
+generatedAt: 2026-11-06T07:36:51.536Z
 notice:
-  headline: "[EMERGENCY NOTICE] Iligan City Fire Hazard Triggers Fatal Structural Wipe"
-  body: A devastating fire event in Iligan City destroyed P900,000 in structural
-    durability and resulted in 2 player casualties. Avoid the fire hazard zone!
+  headline: "[EMERGENCY NOTICE] Iligan City Alchemist Fire Triggers Fatal Map Wipe"
+  body: A catastrophic fire hazard and crafting accident in Iligan City resulted
+    in P900k property damage and permanently eliminated two players from the
+    Republic Server.
 sanctions:
-  - player: "Guild: Iligan_Firecracker_Crafters"
+  - player: "Player: Iligan_Alchemist"
     penalty: PERM BAN
-    infraction: Unauthorized hazardous crafting at an unregistered firecracker
-      station led to a fatal explosion and server safety violations.
+    infraction: Violating safe crafting protocols by operating an unauthorized
+      illegal firecracker sweatshop that resulted in fatal server casualties.
 gvg:
-  title: Palace Threatens Swift Veto Hammer on Suspicious Guild Ledgers
-  label: BUDGET SIEGE ALERT
-  body: Guild leaders have been warned by the Palace that any suspicious items and
-    budget red flags spotted in the ledger will face an immediate veto hammer
-    from GM Marcos. This strict audit policy serves as a reminder that
-    unauthorized loot and shady item synthesis will trigger server-wide wipes.
+  title: Palace Threatens Swift Veto Skill Over Budget Red Flags
+  label: SERVER ADMIN WARNING
+  body: Server admin Palace has issued a stern warning that suspicious allocations
+    hidden within the guild budget run a high risk of triggering another swift
+    presidential veto skill. Lawmakers are being advised to scrub their
+    financial builds immediately or face catastrophic server-wide nerfs.
 realmStatuses:
   - region: Luzon
-    status: "[PRAYING FOR RAIN DEBUFF]"
+    status: "[CHIEF JUSTICE LEVEL UP]"
   - region: Visayas
-    status: "[BUDGET VETO HAMMER READY]"
+    status: "[MANGROVES BLOCK FLOOD DEBUFF]"
   - region: Mindanao
-    status: "[GUILD PROTECTION REVOKED]"
+    status: "[ALCHEMIST SHOP EXPLODES]"
 macro:
   usdRate: 62.995
   usdDate: 2026-11-05
@@ -32,11 +33,11 @@ macro:
     ruleCurve: 198.98
     observedAt: November 06,2026 08:00:00 am
 weather:
-  temp: 31
-  feels: 33
-  humidity: 52
+  temp: 32
+  feels: 35
+  humidity: 48
   desc: Sunny
-  observedAt: 03:40 AM
+  observedAt: 06:40 AM
 history:
   title: Today in Filipino history, November 6, 1915, Nicanor Yñiguez was born in
     Maasin, Leyte
@@ -50,6 +51,28 @@ history:
     political landscape of the Philippines during the Marcos era and beyond.
   url: https://kahimyang.com/articles/3166/today-in-filipino-history-november-6-1915-nicanor-y-iguez-was-born-in-maasin-leyte
 quakes:
+  - time: 06 November 2026 - 03:11 PM
+    lat: "13.68"
+    lon: "120.62"
+    depth: "109"
+    mag: "1.6"
+    location: 017 km S 06° W of Calatagan (Batangas)
+    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_071143_B1.html
+  - time: 06 November 2026 - 02:28 PM
+    lat: "05.25"
+    lon: "125.17"
+    depth: "019"
+    mag: "4.8"
+    location: 033 km S 57° W of Balut Island (Municipality Of Sarangani) (Davao
+      Occidental)
+    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_062824_B2F.html
+  - time: 06 November 2026 - 01:38 PM
+    lat: "12.46"
+    lon: "120.84"
+    depth: "007"
+    mag: "1.8"
+    location: 014 km S 89° W of Rizal (Occidental Mindoro)
+    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_053809_B1.html
   - time: 06 November 2026 - 12:27 PM
     lat: "05.35"
     lon: "125.26"
@@ -101,28 +124,6 @@ quakes:
     mag: "2.1"
     location: 019 km S 71° E of Glan (Sarangani)
     url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1105_223920_B1F.html
-  - time: 06 November 2026 - 06:34 AM
-    lat: "05.83"
-    lon: "125.43"
-    depth: "032"
-    mag: "2.2"
-    location: 025 km N 89° E of Glan (Sarangani)
-    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1105_223413_B1F.html
-  - time: 06 November 2026 - 06:23 AM
-    lat: "05.58"
-    lon: "125.44"
-    depth: "033"
-    mag: "2.3"
-    location: 012 km N 14° W of Sarangani Island (Municipality Of Sarangani) (Davao
-      Occidental)
-    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1105_222352_B1F.html
-  - time: 06 November 2026 - 06:21 AM
-    lat: "06.63"
-    lon: "123.79"
-    depth: "003"
-    mag: "2.2"
-    location: 030 km N 74° W of Kalamansig (Sultan Kudarat)
-    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1105_222148_B1.html
 stocks:
   gainer:
     ticker: PHES
@@ -130,6 +131,14 @@ stocks:
   loser:
     ticker: ABSP
     change: -22.68%
+asteroid:
+  name: 2001 KF54
+  diameter: 0.648694146
+  missDistance: 7243783.810090054
+  velocity: 16.4249116254
+  hazardous: true
+  approachDate: 2026-Nov-06 03:38
+  url: https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=3076814
 ---
 
 Generated site data.
