@@ -54,5 +54,35 @@ const {
       </div>
     </main>
     <SiteFooter />
+    <script>
+      // Recolor the Botpress webchat (shadow DOM on #fab-root) to the site palette:
+      // navy primary #09436b with the gold accent #ffe088 on the bubble icon.
+      const BP_THEME = `
+        .bpReset {
+          --bpPrimary-50: #ffe088;
+          --bpPrimary-100: #fed65b;
+          --bpPrimary-200: #c7d9e4;
+          --bpPrimary-300: #a1bfd1;
+          --bpPrimary-400: #6d97b1;
+          --bpPrimary-500: #2b5b84;
+          --bpPrimary-600: #09436b;
+          --bpPrimary-700: #073654;
+          --bpPrimary-800: #052940;
+          --bpPrimary-900: #041d2f;
+          --bpPrimary-950: #02121d;
+        }
+      `;
+      const applyBpTheme = () => {
+        const root = document.getElementById('fab-root')?.shadowRoot;
+        if (!root || root.getElementById('bp-site-theme')) return;
+        const style = document.createElement('style');
+        style.id = 'bp-site-theme';
+        style.textContent = BP_THEME;
+        root.appendChild(style);
+      };
+      // The widget mounts lazily and may re-render, so keep re-applying on DOM changes.
+      applyBpTheme();
+      new MutationObserver(applyBpTheme).observe(document.body, { childList: true, subtree: true });
+    </script>
   </body>
 </html>
