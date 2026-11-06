@@ -17,7 +17,7 @@ import {
 } from '../src/lib/newsFeed.ts';
 // patches module no longer imported — categories and tag classes are dynamic
 
-const NEWSINFO_URL = 'https://newsinfo.inquirer.net/';
+const RSS_FEED_URL = 'https://newsinfo.inquirer.net/feed';
 const FIRECRAWL_ENDPOINT = 'https://api.firecrawl.dev/v1/scrape';
 const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-8b'];
 let geminiKeyCursor = 0;
@@ -437,15 +437,6 @@ async function firecrawlScrape(url: string): Promise<string> {
   return data?.data?.markdown ?? '';
 }
 
-function extractArticleUrls(md: string): string[] {
-  const urls = new Set<string>();
-  const re = /https?:\/\/newsinfo\.inquirer\.net\/\d+\/[^\s)"']+/g;
-  for (const m of md.matchAll(re)) {
-    urls.add(m[0].replace(/[.,;:!?)]+$/, ''));
-  }
-  return [...urls];
-}
-
 const storyList = (news: NewsItem[]) =>
   news.map((n, i) => `${i + 1}. ${n.headline}\n   ${n.summary}`).join('\n');
 
@@ -648,49 +639,33 @@ async function main() {
     return;
   }
   if (!process.env.FIRECRAWL_API_KEY || process.env.FIRECRAWL_API_KEY === 'fc-your-firecrawl-key') {
-    console.warn('[site] FIRECRAWL_API_KEY missing or placeholder; skipping news scraping, keeping existing news.ts');
+    console.warn('[site] FIRECRAWL_API_KEY missing or placeholder; stocks feed will use previous value');
   }
   const prev = await loadPrevious();
-  let mainMd = '';
+  let items: FeedItem[] = [];
   try {
-    console.log(`[news] scraping ${NEWSINFO_URL} via firecrawl…`);
-    mainMd = await firecrawlScrape(NEWSINFO_URL);
+    console.log(`[news] fetching RSS ${RSS_FEED_URL}…`);
+    const res = await fetch(RSS_FEED_URL, {
+      headers: { 'User-Agent': UA },
+      signal: AbortSignal.timeout(30_000),
+    });
+    if (!res.ok) throw new Error(`rss HTTP ${res.status}`);
+    items = parseFeedItems(await res.text()).slice(0, LIMIT);
+    console.log(`[news] found ${items.length} RSS items`);
   } catch (err) {
-    console.warn(`[news] firecrawl failed (${message(err)}); keeping previous news.ts`);
-    mainMd = '';
-  }
-  if (!mainMd) {
-    console.warn('[site] firecrawl unavailable; keeping all existing data files');
-    return;
-  }
-  const articleUrls = extractArticleUrls(mainMd).slice(0, LIMIT);
-  if (articleUrls.length === 0) throw new Error('no article URLs found on newsinfo.inquirer.net');
-  console.log(`[news] found ${articleUrls.length} article URLs`);
-
-  const items: FeedItem[] = [];
-  const crawled = new Map<string, string>();
-  for (const url of articleUrls) {
-    try {
-      console.log(`[news] scraping ${url}…`);
-      const md = await firecrawlScrape(url);
-      const titleMatch = md.match(/^#\s+(.+)$/m);
-      const title = titleMatch ? titleMatch[1].trim() : url.split('/').pop()?.replace(/-/g, ' ') ?? '';
-      crawled.set(url, md);
-      items.push({ title, link: url, pubDate: new Date().toISOString(), description: md.slice(0, 500) });
-    } catch (err) {
-      console.warn(`[news] failed to scrape ${url}: ${message(err)}`);
-    }
+    console.warn(`[news] RSS failed (${message(err)}); keeping previous news.ts`);
+    items = [];
   }
   if (items.length === 0) {
-    console.warn('[news] no articles scraped; keeping previous news.ts');
+    console.warn('[news] no articles; keeping previous news.ts');
   } else {
-    console.log(`[news] scraped ${items.length} articles`);
+    console.log(`[news] using ${items.length} RSS descriptions`);
   }
 
   const news: NewsItem[] = [];
   const contents = new Map<string, string>();
   for (const item of items) {
-    const content = crawled.get(item.link) ?? item.description.replace(/<[^>]+>/g, ' ');
+    const content = item.description.replace(/<[^>]+>/g, ' ');
     contents.set(item.link, content);
     try {
       console.log(`[news] rewriting: ${item.title.slice(0, 60)}…`);
