@@ -7,6 +7,7 @@ const gmOnDuty = defineCollection({
   schema: z.object({
     name: z.string(),
     role: z.string().default('GM on Duty'),
+    avatar: z.string().default('kafra_ate_leina'),
     location: z.string().default(''),
     status: z.string().default('On Duty'),
     lang: z.string().default('tl'),

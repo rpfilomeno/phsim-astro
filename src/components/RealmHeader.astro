@@ -1,12 +1,15 @@
 ---
 import KafraPortrait from './KafraPortrait.astro';
 import { getEntry, getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import { gmAvatars } from '../config/gmAvatars';
 const siteEntry = await getEntry('siteData', 'site-data');
 const realmStatuses = siteEntry?.data.realmStatuses ?? null;
 
 const gmEntry = (await getCollection('gmOnDuty'))[0];
-const gm = gmEntry?.data ?? { name: 'GM on Duty', role: 'GM on Duty', location: '', status: 'On Duty', lang: 'tl' };
+const gm = gmEntry?.data ?? { name: 'GM on Duty', role: 'GM on Duty', avatar: 'kafra_ate_leina', location: '', status: 'On Duty', lang: 'tl' };
 const GmContent = gmEntry ? (await render(gmEntry)).Content : null;
+const avatar = gmAvatars[gm.avatar as keyof typeof gmAvatars] ?? gmAvatars.kafra_ate_leina;
 
 const fallbackStatuses = [
   { region: 'Luzon', status: '[MAINTENANCE - FLOOD DRILL]' },
@@ -123,7 +126,7 @@ const navItems = [
             >{gm.role}{gm.location ? ` · ${gm.location}` : ''}</span
           >
         </span>
-        <KafraPortrait class="w-8 h-8 rounded object-cover ring-1 ring-secondary" />
+        <Image src={avatar} alt={gm.name} class="w-8 h-8 rounded object-cover ring-1 ring-secondary" />
       </a>
     </div>
   </div>

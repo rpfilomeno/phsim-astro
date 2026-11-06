@@ -1,6 +1,7 @@
 ---
 name: GM Kuya
 role: GM on Duty
+avatar: kafra_ate_leina
 location: Ortigas Station
 status: On Duty
 lang: tl
