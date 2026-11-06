@@ -1,11 +1,21 @@
-const PHT_OFFSET = 8 * 60 * 60 * 1000;
-export const REBOOT_DAY = 2; // 0=Sun ... 2=Tue
-export const REBOOT_HOUR = 6;
-export const WINDOW_HOURS = 8;
-export const EXTENSION_HOURS = 4;
-export const REBOOT_NOTE = `+${EXTENSION_HOURS}h Brownout Extension`;
-const DAY = 24 * 60 * 60 * 1000;
+import {
+  REBOOT_DAY,
+  REBOOT_HOUR,
+  WINDOW_HOURS,
+  EXTENSION_HOURS,
+  REBOOT_NOTE,
+} from '../config/reboot.ts';
 
+export {
+  REBOOT_DAY,
+  REBOOT_HOUR,
+  WINDOW_HOURS,
+  EXTENSION_HOURS,
+  REBOOT_NOTE,
+} from '../config/reboot.ts';
+
+const PHT_OFFSET = 8 * 60 * 60 * 1000;
+const DAY = 24 * 60 * 60 * 1000;
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export type RebootWindow = { start: number; end: number };
