@@ -7,7 +7,7 @@ const allPatches = allPatchesRaw.map((p) => p.data);
 
 const patchTitle = allPatches.map((p) => p.tag).join(' & ') || 'Server Patches';
 
-const rebootLabel = `${nextRebootDateLabel()} · ${rebootScheduleLabel()}`;
+const rebootLabel = rebootScheduleLabel();
 
 // Derive filter buttons dynamically from the patches that exist
 const categories = [...new Set(allPatches.map((p) => p.category))];
