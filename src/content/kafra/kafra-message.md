@@ -2,6 +2,7 @@
 name: GM Godie
 booth: Makati / BGC Booth
 branch: 'BRANCH #04'
+avatar: kafra_ate_leina
 lang: tl
 ---
 

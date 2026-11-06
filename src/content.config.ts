@@ -20,6 +20,7 @@ const kafra = defineCollection({
     name: z.string(),
     booth: z.string(),
     branch: z.string(),
+    avatar: z.string().default('kafra_ate_leina'),
     lang: z.string().default('tl'),
   }),
 });
