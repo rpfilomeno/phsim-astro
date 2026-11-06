@@ -164,7 +164,7 @@ type Previous = {
   stocks: Stocks | null;
 };
 
-async function llmJson<T>(system: string, user: string, maxTokens: number): Promise<T> {
+async function llmJson<T>(system: string, user: string, maxTokens: number, schema?: object): Promise<T> {
   const keys = geminiKeys();
   if (keys.length === 0) throw new Error('GEMINIKEYS env var is empty or unset');
 
@@ -184,6 +184,7 @@ async function llmJson<T>(system: string, user: string, maxTokens: number): Prom
               generationConfig: {
                 maxOutputTokens: maxTokens,
                 responseMimeType: 'application/json',
+                ...(schema ? { responseSchema: schema } : {}),
                 temperature: 0.7,
               },
             }),
@@ -468,7 +469,42 @@ async function buildPatches(
     .filter(Boolean)
     .join('\n');
   const user = `${withText}\n\nLive data:\n${extraText}\n\nExample of the expected patch format:\n${JSON.stringify(EXAMPLE_PATCH)}\n\nSelect up to 5 fitting stories (and optionally create patches inspired by the live data above) and reply {"patches": [...]}.`;
-  const raw = await llmJson<{ patches?: RawPatch[] }>(PATCH_SYSTEM, user, 4000);
+  const raw = await llmJson<{ patches?: RawPatch[] }>(PATCH_SYSTEM, user, 4000, {
+    type: 'object',
+    properties: {
+      patches: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            category: { type: 'string' },
+            tag: { type: 'string' },
+            code: { type: 'string' },
+            title: { type: 'string' },
+            body: { type: 'string' },
+            classes: { type: 'array', items: { type: 'string' } },
+            stats: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  label: { type: 'string' },
+                  value: { type: 'string' },
+                  note: { type: 'string' },
+                  tone: { type: 'string', enum: ['error', 'primary', 'tertiary'] },
+                },
+                required: ['label', 'value'],
+              },
+            },
+            notice: { type: 'string' },
+            gmNote: { type: 'string' },
+          },
+          required: ['category', 'code', 'title', 'body', 'classes', 'stats', 'gmNote'],
+        },
+      },
+    },
+    required: ['patches'],
+  });
   const out: GeneratedPatch[] = [];
   for (const p of raw.patches ?? []) {
     const category = p.category ?? '';
@@ -511,6 +547,14 @@ async function buildNotice(news: NewsItem[]): Promise<Notice | null> {
     NOTICE_SYSTEM,
     `Today's stories:\n${storyList(news)}`,
     400,
+    {
+      type: 'object',
+      properties: {
+        headline: { type: 'string', nullable: true },
+        body: { type: 'string' },
+      },
+      required: ['headline', 'body'],
+    },
   );
   if (!raw.headline || !raw.body) return null;
   return { headline: raw.headline, body: raw.body };
@@ -521,6 +565,24 @@ async function buildSanctions(news: NewsItem[]): Promise<Sanction[]> {
     SANCTION_SYSTEM,
     `Today's stories:\n${storyList(news)}`,
     700,
+    {
+      type: 'object',
+      properties: {
+        sanctions: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              player: { type: 'string' },
+              penalty: { type: 'string' },
+              infraction: { type: 'string' },
+            },
+            required: ['player', 'penalty', 'infraction'],
+          },
+        },
+      },
+      required: ['sanctions'],
+    },
   );
   return (raw.sanctions ?? [])
     .filter((s) => s?.player && s?.penalty && s?.infraction)
@@ -532,6 +594,15 @@ async function buildGvg(news: NewsItem[]): Promise<Gvg | null> {
     GVG_SYSTEM,
     `Today's stories:\n${storyList(news)}`,
     400,
+    {
+      type: 'object',
+      properties: {
+        title: { type: 'string', nullable: true },
+        label: { type: 'string' },
+        body: { type: 'string' },
+      },
+      required: ['title', 'label', 'body'],
+    },
   );
   if (!raw.title || !raw.label || !raw.body) return null;
   return { title: raw.title, label: raw.label, body: raw.body };
@@ -544,6 +615,23 @@ async function buildRealm(news: NewsItem[]): Promise<RealmStatus[] | null> {
     REALM_SYSTEM,
     `Today's stories:\n${storyList(news)}`,
     400,
+    {
+      type: 'object',
+      properties: {
+        statuses: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              region: { type: 'string' },
+              status: { type: 'string' },
+            },
+            required: ['region', 'status'],
+          },
+        },
+      },
+      required: ['statuses'],
+    },
   );
   const byRegion = new Map(
     (raw.statuses ?? [])
@@ -610,6 +698,15 @@ async function main() {
         NEWS_SYSTEM,
         `Headline: ${item.title}\nPublished: ${item.pubDate}\nSource: ${item.link}\n\nArticle:\n${(content || item.title).slice(0, 4000)}`,
         600,
+        {
+          type: 'object',
+          properties: {
+            tag: { type: 'string' },
+            title: { type: 'string' },
+            summary: { type: 'string' },
+          },
+          required: ['tag', 'title', 'summary'],
+        },
       );
       if (!draft.tag || !draft.title || !draft.summary) throw new Error('llm reply missing fields');
       const published = new Date(item.pubDate);
