@@ -66,6 +66,18 @@ const siteData = defineCollection({
   loader: glob({ base: './src/content/siteData', pattern: '**/*.md' }),
   schema: z.object({
     generatedAt: z.coerce.string().default(''),
+    asteroid: z
+      .object({
+        name: z.string(),
+        diameter: z.number(),
+        missDistance: z.number(),
+        velocity: z.number(),
+        hazardous: z.boolean(),
+        approachDate: z.string(),
+        url: z.string(),
+      })
+      .nullable()
+      .default(null),
     notice: z.object({ headline: z.string(), body: z.string() }).nullable().default(null),
     sanctions: z.array(z.object({ player: z.string(), penalty: z.string(), infraction: z.string() })).default([]),
     gvg: z.object({ title: z.string(), label: z.string(), body: z.string() }).nullable().default(null),

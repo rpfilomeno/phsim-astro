@@ -37,6 +37,7 @@ jobs:
         env:
           GEMINIKEYS: ${{ secrets.GEMINIKEYS }}
           FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+          NASA_API_KEY: ${{ secrets.NASA_API_KEY }}
 
       - name: Build
         run: npm run build
@@ -44,6 +45,7 @@ jobs:
           BASE_PATH: /
           GEMINIKEYS: ${{ secrets.GEMINIKEYS }}
           FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+          NASA_API_KEY: ${{ secrets.NASA_API_KEY }}
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5

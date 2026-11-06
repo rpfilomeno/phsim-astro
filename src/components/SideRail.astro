@@ -11,6 +11,7 @@ const generatedQuakes = siteEntry?.data.quakes ?? null;
 const generatedSanctions = siteEntry?.data.sanctions ?? [];
 const weather = siteEntry?.data.weather ?? null;
 const stocks = siteEntry?.data.stocks ?? null;
+const asteroid = siteEntry?.data.asteroid ?? null;
 
 // Kafra card content comes from src/content/kafra/*.md (frontmatter = staff info).
 const kafraEntry = (await getCollection('kafra'))[0];
@@ -293,6 +294,52 @@ const angatPct = angat ? Math.min(100, Math.max(0, Math.round((angat.level / ang
             <p class="text-on-surface mt-0.5">Infraction: {entry.infraction}</p>
           </div>
         ))
+      }
+    </div>
+  </section>
+  <section
+    id="asteroid"
+    class="bg-surface-container rounded shadow-md overflow-hidden"
+    aria-labelledby="asteroid-title"
+  >
+    <div class="bg-inverse-surface text-inverse-on-surface px-space-md py-1.5 flex items-center justify-between">
+      <h2 id="asteroid-title" class="font-title-md text-body-sm font-bold">Asteroid Watch (NEO)</h2>
+      <span class="font-label-badge text-label-badge text-error-container">
+        {asteroid?.hazardous ? 'HAZARDOUS' : 'CLEAR'}
+      </span>
+    </div>
+    <div class="p-space-md bg-surface-container-lowest flex flex-col gap-space-xs font-body-sm text-body-sm">
+      {
+        asteroid ? (
+          <>
+            <div class="flex flex-col">
+              <span class="font-title-md text-body-sm text-primary font-bold">{asteroid.name}</span>
+              <span class="font-body-sm text-on-surface-variant">
+                {asteroid.hazardous ? 'Potentially hazardous' : 'Not hazardous'} · {asteroid.approachDate}
+              </span>
+            </div>
+            <div class="grid grid-cols-2 gap-space-xs">
+              <div class="p-space-xs bg-surface-container-low rounded flex flex-col">
+                <span class="font-label-badge text-label-badge text-on-surface-variant uppercase">Diameter</span>
+                <span class="font-label-data text-label-data font-bold">{asteroid.diameter.toFixed(3)} km</span>
+              </div>
+              <div class="p-space-xs bg-surface-container-low rounded flex flex-col">
+                <span class="font-label-badge text-label-badge text-on-surface-variant uppercase">Miss Distance</span>
+                <span class="font-label-data text-label-data font-bold">{Math.round(asteroid.missDistance).toLocaleString()} km</span>
+              </div>
+              <div class="p-space-xs bg-surface-container-low rounded flex flex-col">
+                <span class="font-label-badge text-label-badge text-on-surface-variant uppercase">Velocity</span>
+                <span class="font-label-data text-label-data font-bold">{asteroid.velocity.toFixed(2)} km/s</span>
+              </div>
+              <div class="p-space-xs bg-surface-container-low rounded flex flex-col">
+                <span class="font-label-badge text-label-badge text-on-surface-variant uppercase">JPL</span>
+                <a href={asteroid.url} target="_blank" rel="noopener noreferrer" class="font-body-sm text-primary font-semibold hover:underline">Details</a>
+              </div>
+            </div>
+          </>
+        ) : (
+          <p class="text-on-surface-variant">No asteroid data available.</p>
+        )
       }
     </div>
   </section>

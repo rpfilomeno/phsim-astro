@@ -152,6 +152,7 @@ type Stocks = { gainer: StockMover | null; loser: StockMover | null };
 /** Shape of the previous run's siteData.ts — used as the stale-data cache. */
 type Previous = {
   generatedAt: string;
+  asteroid: { name: string; diameter: number; missDistance: number; velocity: number; hazardous: boolean; approachDate: string; url: string } | null;
   notice: Notice | null;
   sanctions: Sanction[];
   gvg: Gvg | null;
@@ -340,7 +341,57 @@ async function fetchQuakes(prev: Previous | null): Promise<Quake[] | null> {
   }
 }
 
-async function fetchStocks(prev: Previous | null): Promise<Stocks | null> {
+async function fetchAsteroid(prev: Previous | null): Promise<Previous['asteroid']> {
+  const key = process.env.NASA_API_KEY;
+  if (!key) {
+    console.warn('[site] NASA_API_KEY missing; skipping asteroid feed');
+    return prev?.asteroid ?? null;
+  }
+  try {
+    const today = phtDay(new Date());
+    const url =
+      'https://api.nasa.gov/neo/rest/v1/feed?start_date=' +
+      today +
+      '&end_date=' +
+      today +
+      '&api_key=' +
+      encodeURIComponent(key);
+    const res = await fetch(url, { signal: AbortSignal.timeout(30_000) });
+    if (!res.ok) throw new Error(`nasa neo HTTP ${res.status}`);
+    const data = await res.json();
+    const list = (data?.near_earth_objects?.[today] ?? []) as any[];
+    if (list.length === 0) throw new Error('no neo entries');
+    // Prefer hazardous, then closest approach.
+    const hazardous = list.filter((n) => n?.is_potentially_hazardous_asteroid);
+    const pool = hazardous.length ? hazardous : list;
+    let best: any = null;
+    let bestDist = Infinity;
+    for (const n of pool) {
+      const ca = n?.close_approach_data?.[0];
+      const dist = Number(ca?.miss_distance?.kilometers);
+      if (Number.isFinite(dist) && dist < bestDist) {
+        bestDist = dist;
+        best = n;
+      }
+    }
+    if (!best) throw new Error('no approach data');
+    const ca = best.close_approach_data[0];
+    const diam = best.estimated_diameter?.kilometers;
+    const diameter = Number(diam?.estimated_diameter_max ?? diam?.estimated_diameter_min ?? 0);
+    return {
+      name: String(best.name ?? '').replace(/[()]/g, '').trim(),
+      diameter: Number.isFinite(diameter) ? diameter : 0,
+      missDistance: Number(ca.miss_distance.kilometers),
+      velocity: Number(ca.relative_velocity.kilometers_per_second),
+      hazardous: !!best.is_potentially_hazardous_asteroid,
+      approachDate: String(ca.close_approach_date_full ?? ca.close_approach_date ?? today),
+      url: String(best.nasa_jpl_url ?? ''),
+    };
+  } catch (err) {
+    console.warn(`[site] asteroid feed failed (${message(err)}); keeping previous value`);
+    return prev?.asteroid ?? null;
+  }
+}
   try {
     const md = await firecrawlScrape(PHILIPPINE_STOCKS_URL);
     const headerRe = /\| Stock \| Value \| Price \| Change \| %Change \|/g;
@@ -600,6 +651,7 @@ async function main() {
   const history = await fetchHistory(prev);
   const quakes = await fetchQuakes(prev);
   const stocks = await fetchStocks(prev);
+  const asteroid = await fetchAsteroid(prev);
   const patches = await attempt(
     'patches',
     () => buildPatches(news, contents, { macro, weather, history, quakes }),
@@ -643,6 +695,7 @@ async function main() {
     history,
     quakes,
     stocks,
+    asteroid,
   };
   const frontmatter = stringify(siteData);
   writeFileSync(SITE_OUTPUT, `---\n${frontmatter}---\n\nGenerated site data.\n`);
