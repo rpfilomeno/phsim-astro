@@ -1,4 +1,12 @@
 ---
+import { getEntry } from 'astro:content';
+const siteEntry = await getEntry('siteData', 'site-data');
+const generatedNotice = siteEntry?.data.notice ?? null;
+
+const notice = generatedNotice ?? {
+  headline: '[EMERGENCY NOTICE] MRT-3 Line Server Crash & EDSA Carousel Traffic Debuff',
+  body: 'All Acolyte Agility Up / Increase AGI buffs are suppressed during peak rush hours (07:00 ~ 09:30 PHT). Commuter Merchant carts exceeding 50% capacity suffer a severe movement slow debuff.',
+};
 ---
 
 <section
@@ -12,14 +20,8 @@
       aria-hidden="true">!</span
     >
     <div class="flex flex-col">
-      <p class="font-title-md text-body-md text-on-tertiary leading-snug">
-        [EMERGENCY NOTICE] MRT-3 Line Server Crash &amp; EDSA Carousel Traffic Debuff
-      </p>
-      <p class="font-body-sm text-body-sm text-on-tertiary-container">
-        All Acolyte Agility Up / Increase AGI buffs are suppressed during peak rush hours
-        (07:00 ~ 09:30 PHT). Commuter Merchant carts exceeding 50% capacity suffer a severe
-        movement slow debuff.
-      </p>
+      <p class="font-title-md text-body-md text-on-tertiary leading-snug">{notice.headline}</p>
+      <p class="font-body-sm text-body-sm text-on-tertiary-container">{notice.body}</p>
     </div>
   </div>
   <div class="flex items-center gap-space-md bg-tertiary px-space-md py-1 rounded shrink-0">

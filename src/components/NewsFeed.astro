@@ -1,0 +1,88 @@
+---
+import { getCollection } from 'astro:content';
+const newsEntries = await getCollection('news');
+const sorted = newsEntries.sort((a, b) =>
+  new Date(b.data.publishedAt).getTime() - new Date(a.data.publishedAt).getTime()
+);
+const news = sorted.slice(0, 8).map((e) => ({
+  slug: e.data.slug,
+  tag: e.data.tag,
+  title: e.data.title,
+  summary: e.data.summary,
+  headline: e.data.headline,
+  url: e.data.url,
+  publishedAt: e.data.publishedAt,
+}));
+const generatedAt = sorted[0]?.data.generatedAt ?? '';
+
+const fmt = (iso: string) => {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime())
+    ? iso
+    : d.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+};
+---
+
+<section
+  id="news-wire"
+  aria-labelledby="news-wire-title"
+  class="bg-surface-container rounded shadow-md overflow-hidden"
+>
+  <div
+    class="bg-tertiary text-on-tertiary px-space-md py-1.5 flex items-center justify-between gap-space-sm"
+  >
+    <h2 id="news-wire-title" class="font-title-md text-body-sm font-bold">
+      Republic Server News Wire
+    </h2>
+    <span
+      class="font-label-badge text-label-badge bg-tertiary-container text-on-tertiary px-1.5 py-0.5 rounded"
+      >RSS · INQUIRER FULLFEED</span
+    >
+  </div>
+  <div class="p-space-md bg-surface-container-lowest flex flex-col gap-space-sm">
+    {
+      news.length === 0 && (
+        <p class="font-body-sm text-body-sm text-on-surface-variant">
+          No dispatches received. Run <code>npm run generate:news</code>.
+        </p>
+      )
+    }
+    {
+      news.map((item) => (
+        <article class="p-space-sm bg-surface-container-low rounded flex flex-col gap-1">
+          <div class="flex flex-wrap items-center justify-between gap-space-xs">
+            <span class="px-1.5 py-0.5 bg-secondary text-on-secondary rounded font-label-badge text-label-badge">
+              [{item.tag}]
+            </span>
+            <time
+              datetime={item.publishedAt}
+              class="font-label-data text-label-data text-on-surface-variant"
+            >
+              {fmt(item.publishedAt)}
+            </time>
+          </div>
+          <h3 class="font-title-md text-body-md">
+            <a
+              href={item.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-primary font-bold hover:underline"
+            >
+              {item.title}
+            </a>
+          </h3>
+          <p class="font-body-sm text-body-sm text-on-surface leading-snug">{item.summary}</p>
+          <p class="font-body-sm text-body-sm text-on-surface-variant italic truncate">
+            via Inquirer: {item.headline}
+          </p>
+        </article>
+      ))
+    }
+    <div
+      class="flex flex-wrap justify-between gap-space-xs font-label-data text-label-data text-on-surface-variant pt-0.5"
+    >
+      <span>SOURCE: INQUIRER.NET FULLFEED</span>
+      <span>SYNCED: {fmt(generatedAt)}</span>
+    </div>
+  </div>
+</section>

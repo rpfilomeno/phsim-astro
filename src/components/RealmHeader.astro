@@ -1,5 +1,26 @@
 ---
 import KafraPortrait from './KafraPortrait.astro';
+import { getEntry } from 'astro:content';
+const siteEntry = await getEntry('siteData', 'site-data');
+const realmStatuses = siteEntry?.data.realmStatuses ?? null;
+
+const fallbackStatuses = [
+  { region: 'Luzon', status: '[MAINTENANCE - FLOOD DRILL]' },
+  { region: 'Visayas', status: '[OVERCROWDED - ISLAND HOP]' },
+  { region: 'Mindanao', status: '[HIGH PING / WARP GATE UNSTABLE]' },
+];
+
+const toneClass: Record<string, string> = {
+  error: 'text-error',
+  secondary: 'text-secondary',
+  tertiary: 'text-tertiary',
+};
+
+// Color is fixed per region: Luzon error, Visayas secondary, Mindanao tertiary.
+const statuses = (realmStatuses ?? fallbackStatuses).map((s) => ({
+  ...s,
+  tone: s.region === 'Luzon' ? 'error' : s.region === 'Visayas' ? 'secondary' : 'tertiary',
+}));
 
 const navItems = [
   { href: '#patch-log', label: 'Main Patch Notes', current: true },
@@ -26,15 +47,11 @@ const navItems = [
         <ul
           class="flex flex-wrap items-center gap-x-space-md gap-y-1 font-label-data text-label-data text-on-surface-variant"
         >
-          <li class="flex items-center gap-1 whitespace-nowrap">
-            Luzon <span class="text-error font-bold">[MAINTENANCE - FLOOD DRILL]</span>
-          </li>
-          <li class="flex items-center gap-1 whitespace-nowrap">
-            Visayas <span class="text-secondary font-bold">[OVERCROWDED - ISLAND HOP]</span>
-          </li>
-          <li class="flex items-center gap-1 whitespace-nowrap">
-            Mindanao <span class="text-tertiary font-bold">[HIGH PING / WARP GATE UNSTABLE]</span>
-          </li>
+          {statuses.map((s) => (
+            <li class="flex items-center gap-1 whitespace-nowrap">
+              {s.region} <span class:list={[toneClass[s.tone], 'font-bold']}>{s.status}</span>
+            </li>
+          ))}
         </ul>
       </div>
       <p class="font-label-badge text-label-badge text-on-surface-variant uppercase">

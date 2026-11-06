@@ -1,0 +1,43 @@
+---
+import { getEntry } from 'astro:content';
+const siteEntry = await getEntry('siteData', 'site-data');
+const history = siteEntry?.data.history ?? null;
+---
+
+{
+  history && (
+    <section
+      id="on-this-day"
+      aria-labelledby="on-this-day-title"
+      class="bg-surface-container rounded shadow-md overflow-hidden"
+    >
+      <div
+        class="bg-inverse-surface text-inverse-on-surface px-space-md py-1.5 flex items-center justify-between gap-space-sm"
+      >
+        <h2 id="on-this-day-title" class="font-title-md text-body-sm font-bold">
+          Hall of Legends: Born on This Day
+        </h2>
+        <span
+          class="font-label-badge text-label-badge bg-surface-container text-on-surface px-1.5 py-0.5 rounded"
+          >PH HISTORY ARCHIVE</span
+        >
+      </div>
+      <div class="p-space-md bg-surface-container-lowest flex flex-col gap-1">
+        <h3 class="font-title-md text-body-md">
+          <a
+            href={history.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-primary font-bold hover:underline"
+          >
+            {history.title}
+          </a>
+        </h3>
+        <p class="font-body-sm text-body-sm text-on-surface leading-snug">{history.body}</p>
+        <span class="font-label-data text-label-data text-on-surface-variant"
+          >SOURCE: KAHIMYANG.COM PHILIPPINE HISTORY ARCHIVE</span
+        >
+      </div>
+    </section>
+  )
+}

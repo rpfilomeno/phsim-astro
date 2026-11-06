@@ -8,8 +8,10 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "prebuild": "npm run generate:site",
     "preview": "astro preview",
-    "test": "node --test src/lib/reboot.test.ts",
+    "generate:site": "node --use-system-ca --env-file=.env scripts/generate-site-data.ts",
+    "test": "node --test src/lib/reboot.test.ts src/lib/newsFeed.test.ts",
     "astro": "astro"
   },
   "dependencies": {

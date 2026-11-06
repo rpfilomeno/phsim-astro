@@ -1,6 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import HistoryToday from '../components/HistoryToday.astro';
 import MaintenanceTicker from '../components/MaintenanceTicker.astro';
+import NewsFeed from '../components/NewsFeed.astro';
 import PatchWindow from '../components/PatchWindow.astro';
 import SideRail from '../components/SideRail.astro';
 ---
@@ -11,6 +13,8 @@ import SideRail from '../components/SideRail.astro';
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
       <div class="lg:col-span-8 flex flex-col gap-space-lg">
         <PatchWindow />
+        <NewsFeed />
+        <HistoryToday />
       </div>
       <div class="lg:col-span-4 flex flex-col gap-space-lg">
         <SideRail />

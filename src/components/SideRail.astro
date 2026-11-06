@@ -1,7 +1,28 @@
 ---
+import { getCollection, getEntry, render } from 'astro:content';
 import KafraPortrait from './KafraPortrait.astro';
 
-const sanctions = [
+const siteEntry = await getEntry('siteData', 'site-data');
+const generatedGvg = siteEntry?.data.gvg ?? null;
+const generatedMacro = siteEntry?.data.macro ?? null;
+const generatedQuakes = siteEntry?.data.quakes ?? null;
+const generatedSanctions = siteEntry?.data.sanctions ?? [];
+const weather = siteEntry?.data.weather ?? null;
+const stocks = siteEntry?.data.stocks ?? null;
+
+// Kafra card content comes from src/content/kafra/*.md (frontmatter = staff info).
+const kafraEntry = (await getCollection('kafra'))[0];
+const staff = kafraEntry?.data ?? {
+  name: 'Staff Ate Leina',
+  booth: 'Makati / BGC Booth',
+  branch: 'BRANCH #04',
+  lang: 'tl',
+};
+const KafraContent = kafraEntry ? (await render(kafraEntry)).Content : null;
+
+const quakes = generatedQuakes ?? [];
+
+const fallbackSanctions = [
   {
     player: 'Player: [Fixer_Sa_LTO_01]',
     penalty: 'PERM BAN',
@@ -21,6 +42,32 @@ const sanctions = [
       'Auto-deducting toll zeny with malfunctioning RFID sensors at SLEX expressway portals.',
   },
 ];
+
+const sanctions = generatedSanctions.length > 0 ? generatedSanctions : fallbackSanctions;
+
+const gvg = generatedGvg ?? {
+  title: 'Agit Siege: Fort Santiago & Malacañang Grounds',
+  label: 'Senate Blue Ribbon & Antitrust Probe',
+  body: 'Political dynasties and warlord guild coalitions face congressional subpoena. The joint siege of Northern Dynasties and Southern Clans over 3 consecutive Agits is declared ultra vires under Republic Anti-Monopoly decrees.',
+};
+
+const macro = generatedMacro ?? {
+  usdRate: 58.85,
+  usdDate: '',
+  angat: { level: 178.4, nhwl: 180, ruleCurve: 0, observedAt: '' },
+};
+
+// Below min operating level (180m) = deficit; below rule curve = watch.
+const angat = macro.angat;
+const angatTone =
+  angat && angat.level < 180
+    ? 'error'
+    : angat && angat.ruleCurve > 0 && angat.level < angat.ruleCurve
+      ? 'tertiary'
+      : 'primary';
+const angatLabel =
+  angatTone === 'error' ? 'Deficit Alert' : angatTone === 'tertiary' ? 'Below Rule Curve' : 'Stable';
+const angatPct = angat ? Math.min(100, Math.max(0, Math.round((angat.level / angat.nhwl) * 100))) : 0;
 ---
 
 <aside class="flex flex-col gap-space-lg" aria-label="Server telemetry and service desk">
@@ -34,25 +81,36 @@ const sanctions = [
         <h2 id="kafra-title">Kafra Staff Service Desk PH</h2>
       </div>
       <span class="font-label-badge text-label-badge bg-tertiary-container text-on-tertiary px-1.5 py-0.5 rounded"
-        >BRANCH #04</span
+        >{staff.branch}</span
       >
     </div>
     <div class="p-space-md bg-surface-container-lowest flex gap-space-md items-start">
       <KafraPortrait class="w-16 h-16 rounded shrink-0 shadow-sm" />
       <div class="flex flex-col gap-space-xs">
         <div class="flex flex-wrap items-center justify-between gap-space-xs">
-          <span class="font-title-md text-body-md text-primary font-bold">Staff Ate Leina</span>
+          <span class="font-title-md text-body-md text-primary font-bold">{staff.name}</span>
           <span class="font-label-badge text-label-badge text-secondary font-semibold"
-            >Makati / BGC Booth</span
+            >{staff.booth}</span
           >
         </div>
-        <p
-          lang="tl"
-          class="p-space-xs bg-surface-container-low rounded font-body-sm text-body-sm text-on-surface leading-tight"
-        >
-          "Mabuhay! Welcome to Kafra Services PH! Reminding all adventurers to bring exact barya
-          for cart storage and beware of snatchers near the Quiapo Church save point!"
-        </p>
+        {
+          KafraContent ? (
+            <div
+              lang={staff.lang}
+              class="p-space-xs bg-surface-container-low rounded font-body-sm text-body-sm text-on-surface leading-tight"
+            >
+              <KafraContent />
+            </div>
+          ) : (
+            <p
+              lang="tl"
+              class="p-space-xs bg-surface-container-low rounded font-body-sm text-body-sm text-on-surface leading-tight"
+            >
+              "Mabuhay! Welcome to Kafra Services PH! Reminding all adventurers to bring exact
+              barya for cart storage and beware of snatchers near the Quiapo Church save point!"
+            </p>
+          )
+        }
         <div class="flex flex-wrap gap-space-xs mt-1">
           <a
             href="#macro"
@@ -79,20 +137,45 @@ const sanctions = [
       <span class="font-label-badge text-label-badge text-secondary-fixed">LIVE TICKER</span>
     </div>
     <div class="p-space-md bg-surface-container-lowest flex flex-col gap-space-sm font-body-sm text-body-sm">
-      <div class="flex items-center justify-between gap-space-sm p-space-xs bg-surface-container-low rounded">
-        <div class="flex flex-col">
-          <span class="font-semibold text-on-surface">Chibog / Jollibee Chickenjoy Parity</span>
-          <span class="font-body-sm text-on-surface-variant">Fast-Food Consumer Index</span>
-        </div>
-        <span class="font-label-data text-label-data text-error font-bold text-right">+7.2% YoY ↑</span>
-      </div>
+      {
+        stocks && (stocks.gainer || stocks.loser) && (
+          <div class="flex items-center justify-between gap-space-sm p-space-xs bg-surface-container-low rounded">
+            <div class="flex flex-col">
+              <span class="font-semibold text-on-surface">Market Raid: Top Gainer / Loser</span>
+              <span class="font-body-sm text-on-surface-variant">
+                PSEi Bull/Bear Index · {stocks.gainer ? `${stocks.gainer.ticker} ${stocks.gainer.change}` : '—'} / {stocks.loser ? `${stocks.loser.ticker} ${stocks.loser.change}` : '—'}
+              </span>
+            </div>
+            <span class="font-label-data text-label-data text-secondary font-bold text-right">
+              {stocks.gainer ? stocks.gainer.change : '—'}
+            </span>
+          </div>
+        )
+      }
       <div class="flex items-center justify-between gap-space-sm p-space-xs bg-surface-container-low rounded">
         <div class="flex flex-col">
           <span class="font-semibold text-on-surface">USD to Zeny Remittance Rate</span>
           <span class="font-body-sm text-on-surface-variant">OFW Palay Guild Ticker</span>
         </div>
-        <span class="font-label-data text-label-data text-tertiary font-bold text-right">$1 = 58.85 Z</span>
+        <span class="font-label-data text-label-data text-tertiary font-bold text-right"
+          >$1 = {macro.usdRate} Z</span
+        >
       </div>
+      {
+        weather && (
+          <div class="flex items-center justify-between gap-space-sm p-space-xs bg-surface-container-low rounded">
+            <div class="flex flex-col">
+              <span class="font-semibold text-on-surface">Manila Realm Weather</span>
+              <span class="font-body-sm text-on-surface-variant">
+                {weather.desc} · Feels {weather.feels}°C · Humidity {weather.humidity}%
+              </span>
+            </div>
+            <span class="font-label-data text-label-data text-secondary font-bold text-right">
+              {weather.temp}°C
+            </span>
+          </div>
+        )
+      }
       <div class="flex items-center justify-between gap-space-sm p-space-xs bg-surface-container-low rounded">
         <div class="flex flex-col">
           <span class="font-semibold text-on-surface">Daily Minimum Zeny Wage</span>
@@ -105,25 +188,71 @@ const sanctions = [
       </div>
       <div class="p-space-xs bg-surface-container rounded flex flex-col gap-1">
         <span class="font-label-badge text-label-badge text-on-surface-variant uppercase"
-          >Angat Dam Water Level: 178.4m</span
+          >Angat Dam Water Level: {angat?.level}m</span
         >
         <div
           class="w-full bg-surface-variant h-3 rounded-full overflow-hidden flex"
           role="img"
-          aria-label="Angat Dam at 178.4 metres against a 180 metre threshold: critical shortfall zone"
+          aria-label={`Angat Dam at ${angat?.level} metres against a ${angat?.nhwl} metre normal high water level: ${angatLabel.toLowerCase()}`}
         >
-          <div class="bg-primary h-full w-[45%]" title="Live Water Capacity"></div>
-          <div class="bg-secondary h-full w-[35%]" title="Silt Inflow"></div>
-          <div class="bg-error h-full w-[20%]" title="Critical Shortfall Zone"></div>
+          <div
+            class:list={[
+              'h-full',
+              angatTone === 'error' ? 'bg-error' : angatTone === 'tertiary' ? 'bg-tertiary' : 'bg-primary',
+            ]}
+            style={`width: ${angatPct}%`}
+            title="Current Water Capacity"
+          ></div>
+          <div class="bg-error h-full flex-1" title="Headroom to Normal High Water"></div>
         </div>
         <div class="flex justify-between font-label-badge text-label-badge text-on-surface-variant pt-0.5">
-          <span>Current 178.4m</span>
-          <span>Threshold 180m</span>
-          <span class="text-error font-bold">Deficit Alert</span>
+          <span>Current {angat?.level}m</span>
+          <span>NHWL {angat?.nhwl}m</span>
+          <span class:list={[angatTone === 'error' && 'text-error', 'font-bold']}>{angatLabel}</span>
         </div>
       </div>
     </div>
   </section>
+
+  {
+    quakes.length > 0 && (
+      <section
+        id="seismic"
+        class="bg-surface-container rounded shadow-md overflow-hidden"
+        aria-labelledby="seismic-title"
+      >
+        <div class="bg-error text-on-error px-space-md py-1.5 flex items-center justify-between gap-space-sm">
+          <h2 id="seismic-title" class="font-title-md text-body-sm font-bold">
+            Seismic Bulletin
+          </h2>
+          <span class="font-label-badge text-label-badge bg-error-container text-on-error-container px-1.5 py-0.5 rounded"
+            >PHIVOLCS LIVE</span
+          >
+        </div>
+        <div class="p-space-md bg-surface-container-lowest flex flex-col gap-space-xs">
+          {quakes.slice(0, 5).map((q) => (
+            <div class="p-space-xs bg-surface-container-low rounded flex flex-col gap-0.5">
+              <div class="flex items-center justify-between gap-space-xs font-label-data text-label-data">
+                <span class="text-error font-bold">MAG {q.mag}</span>
+                <span class="text-on-surface-variant">{q.time}</span>
+              </div>
+              <a
+                href={q.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="font-body-sm text-body-sm text-primary font-semibold hover:underline"
+              >
+                {q.location}
+              </a>
+              <span class="font-label-badge text-label-badge text-on-surface-variant">
+                DEPTH {q.depth} KM · {q.lat}°N {q.lon}°E
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+    )
+  }
 
   <section
     id="gvg"
@@ -138,22 +267,16 @@ const sanctions = [
     </div>
     <div class="p-space-md bg-surface-container-lowest flex flex-col gap-space-sm">
       <div class="flex flex-col">
-        <span class="font-title-md text-body-sm text-primary font-bold"
-          >Agit Siege: Fort Santiago &amp; Malacañang Grounds</span
-        >
+        <span class="font-title-md text-body-sm text-primary font-bold">{gvg.title}</span>
         <span class="font-label-data text-label-data text-on-surface-variant"
           >Scheduled: Sunday 20:00 - 22:00 PHT</span
         >
       </div>
       <div class="p-space-sm bg-surface-container-low rounded flex flex-col gap-space-xs">
         <span class="font-label-badge text-label-badge text-tertiary uppercase font-bold"
-          >Senate Blue Ribbon &amp; Antitrust Probe</span
+          >{gvg.label}</span
         >
-        <p class="font-body-sm text-body-sm text-on-surface leading-tight">
-          Political dynasties and warlord guild coalitions face congressional subpoena. The joint
-          siege of Northern Dynasties and Southern Clans over 3 consecutive Agits is declared ultra
-          vires under Republic Anti-Monopoly decrees.
-        </p>
+        <p class="font-body-sm text-body-sm text-on-surface leading-tight">{gvg.body}</p>
       </div>
     </div>
   </section>

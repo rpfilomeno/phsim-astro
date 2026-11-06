@@ -1,5 +1,20 @@
 ---
-import { filters, patches } from '../data/patches';
+import { getCollection } from 'astro:content';
+
+const allPatchesRaw = await getCollection('patches');
+const allPatches = allPatchesRaw.map((p) => p.data);
+
+const patchTitle = allPatches.map((p) => p.tag).join(' & ') || 'Server Patches';
+
+// Derive filter buttons dynamically from the patches that exist
+const categories = [...new Set(allPatches.map((p) => p.category))];
+const filters = [
+  { id: 'all', label: 'ALL RELEASES' },
+  ...categories.map((cat) => {
+    const patch = allPatches.find((p) => p.category === cat);
+    return { id: cat, label: patch?.tag ?? cat.toUpperCase() };
+  }),
+];
 
 const toneClass = {
   error: 'text-error',
@@ -53,8 +68,7 @@ const toneClass = {
         id="patch-window-title"
         class="font-headline-lg text-headline-md md:text-headline-lg text-primary mt-1 font-bold"
       >
-        The Onion Cartel Monopoly, Jeepney Modernization Rebalance &amp; The Great Summer
-        Heat Index Nerf
+        {patchTitle}
       </h1>
     </div>
     <div
@@ -78,25 +92,27 @@ const toneClass = {
         class="flex items-center gap-1 bg-surface-container p-1 rounded overflow-x-auto"
       >
         {
-          filters.map((filter, index) => (
-            <button
-              type="button"
-              data-filter={filter.id}
-              aria-pressed={index === 0 ? 'true' : 'false'}
-              class="filter-tab"
-            >
-              {filter.label}
-            </button>
-          ))
+          filters
+            .filter((filter) => filter.id === 'all' || allPatches.some((p) => p.category === filter.id))
+            .map((filter, index) => (
+              <button
+                type="button"
+                data-filter={filter.id}
+                aria-pressed={index === 0 ? 'true' : 'false'}
+                class="filter-tab"
+              >
+                {filter.label}
+              </button>
+            ))
         }
       </div>
       <p id="patch-filter-status" class="sr-only" role="status"></p>
     </div>
 
     {
-      patches.map((patch) => (
+      allPatches.map((patch) => (
         <article
-          data-patch={patch.slug}
+          data-patch={patch.category}
           class="p-space-md bg-surface-container-low rounded flex flex-col gap-space-sm"
         >
           <div class="flex flex-wrap items-center justify-between gap-space-sm">
