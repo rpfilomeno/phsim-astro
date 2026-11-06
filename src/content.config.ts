@@ -2,6 +2,17 @@ import { defineCollection } from 'astro:content';
 import { z } from 'astro/zod';
 import { glob } from 'astro/loaders';
 
+const gmOnDuty = defineCollection({
+  loader: glob({ base: './src/content/gmOnDuty', pattern: '**/*.md' }),
+  schema: z.object({
+    name: z.string(),
+    role: z.string().default('GM on Duty'),
+    location: z.string().default(''),
+    status: z.string().default('On Duty'),
+    lang: z.string().default('tl'),
+  }),
+});
+
 const kafra = defineCollection({
   loader: glob({ base: './src/content/kafra', pattern: '**/*.md' }),
   schema: z.object({
@@ -69,4 +80,4 @@ const siteData = defineCollection({
   }),
 });
 
-export const collections = { kafra, patches, siteData, news };
+export const collections = { kafra, patches, siteData, news, gmOnDuty };

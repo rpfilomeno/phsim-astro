@@ -1,8 +1,12 @@
 ---
 import KafraPortrait from './KafraPortrait.astro';
-import { getEntry } from 'astro:content';
+import { getEntry, getCollection, render } from 'astro:content';
 const siteEntry = await getEntry('siteData', 'site-data');
 const realmStatuses = siteEntry?.data.realmStatuses ?? null;
+
+const gmEntry = (await getCollection('gmOnDuty'))[0];
+const gm = gmEntry?.data ?? { name: 'GM on Duty', role: 'GM on Duty', location: '', status: 'On Duty', lang: 'tl' };
+const GmContent = gmEntry ? (await render(gmEntry)).Content : null;
 
 const fallbackStatuses = [
   { region: 'Luzon', status: '[MAINTENANCE - FLOOD DRILL]' },
@@ -114,9 +118,9 @@ const navItems = [
         class="hidden sm:flex items-center gap-space-sm shrink-0 bg-surface-container-low px-space-sm py-1 rounded border border-surface-container hover:border-outline-variant transition-colors"
       >
         <span class="flex flex-col text-right">
-          <span class="font-title-md text-body-sm text-on-surface leading-tight">Ate Leina</span>
+          <span class="font-title-md text-body-sm text-on-surface leading-tight">{gm.name}</span>
           <span class="font-label-badge text-label-badge text-on-surface-variant"
-            >Kafra · Ortigas</span
+            >{gm.role}{gm.location ? ` · ${gm.location}` : ''}</span
           >
         </span>
         <KafraPortrait class="w-8 h-8 rounded object-cover ring-1 ring-secondary" />
