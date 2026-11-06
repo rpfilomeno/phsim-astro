@@ -10,7 +10,7 @@
     "build": "astro build",
     "prebuild": "npm run generate:site",
     "preview": "astro preview",
-    "generate:site": "node --use-system-ca --env-file=.env scripts/generate-site-data.ts",
+    "generate:site": "node --use-system-ca scripts/generate-site-data.ts",
     "test": "node --test src/lib/reboot.test.ts src/lib/newsFeed.test.ts",
     "astro": "astro"
   },
