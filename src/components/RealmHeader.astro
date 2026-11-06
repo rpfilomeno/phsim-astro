@@ -116,9 +116,10 @@ const navItems = [
         }
       </nav>
 
-      <a
-        href="#kafra"
-        class="hidden sm:flex items-center gap-space-sm shrink-0 bg-surface-container-low px-space-sm py-1 rounded border border-surface-container hover:border-outline-variant transition-colors"
+      <button
+        type="button"
+        id="gm-chat"
+        class="hidden sm:flex items-center gap-space-sm shrink-0 bg-surface-container-low px-space-sm py-1 rounded border border-surface-container hover:border-outline-variant transition-colors cursor-pointer"
       >
         <span class="flex flex-col text-right">
           <span class="font-title-md text-body-sm text-on-surface leading-tight">{gm.name}</span>
@@ -127,7 +128,7 @@ const navItems = [
           >
         </span>
         <Image src={avatar} alt={gm.name} class="w-8 h-8 rounded object-cover ring-1 ring-secondary" />
-      </a>
+      </button>
     </div>
   </div>
 </header>
@@ -152,4 +153,22 @@ const navItems = [
 
   tick();
   setInterval(tick, 1000);
+
+  // GM card → pop out the Botpress webchat.
+  document.getElementById('gm-chat')?.addEventListener('click', () => {
+    const openNow = () => {
+      const bp = (window as any).botpress;
+      if (bp && typeof bp.open === 'function') {
+        bp.open();
+        return true;
+      }
+      return false;
+    };
+    if (openNow()) return;
+    // Webchat still loading — poll until init finishes (the open() API only exists after init).
+    let tries = 0;
+    const iv = setInterval(() => {
+      if (openNow() || ++tries > 100) clearInterval(iv); // give up after ~10s
+    }, 100);
+  });
 </script>

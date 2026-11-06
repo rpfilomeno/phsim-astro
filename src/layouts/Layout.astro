@@ -34,6 +34,15 @@ const {
       href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@600;700&family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@600;700&display=swap"
       rel="stylesheet"
     />
+    <!-- Botpress webchat: loader first, bot config second; defer keeps order and delays both until parsed -->
+    <script
+      is:inline
+      defer
+      src="https://cdn.botpress.cloud/webchat/v3.7/inject.js"></script>
+    <script
+      is:inline
+      defer
+      src="https://files.bpcontent.cloud/2025/01/25/00/20250125005609-7G1UEWJF.js"></script>
   </head>
   <body
     class="bg-surface font-body-md text-on-surface antialiased selection:bg-secondary selection:text-on-secondary"
