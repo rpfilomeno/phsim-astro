@@ -1,10 +1,13 @@
 ---
 import { getCollection } from 'astro:content';
+import { rebootWindow, rebootScheduleLabel, nextRebootDateLabel } from '../lib/reboot';
 
 const allPatchesRaw = await getCollection('patches');
 const allPatches = allPatchesRaw.map((p) => p.data);
 
 const patchTitle = allPatches.map((p) => p.tag).join(' & ') || 'Server Patches';
+
+const rebootLabel = `${nextRebootDateLabel()} · ${rebootScheduleLabel()}`;
 
 // Derive filter buttons dynamically from the patches that exist
 const categories = [...new Set(allPatches.map((p) => p.category))];
@@ -78,7 +81,7 @@ const toneClass = {
         >WEEKLY SERVER REBOOT</span
       >
       <span class="font-label-data text-label-data text-tertiary font-bold"
-        >Every Tue 06:00 ~ 14:00 PHT (+4h Brownout Extension)</span
+        >{rebootLabel}</span
       >
     </div>
   </div>
