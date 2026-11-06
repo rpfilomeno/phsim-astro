@@ -39,7 +39,7 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          BASE_PATH: /phsim-astro
+          BASE_PATH: /
           GEMINIKEYS: ${{ secrets.GEMINIKEYS }}
           FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
 
