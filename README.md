@@ -30,8 +30,8 @@ Then run `npm run generate:site`.
 
 The site deploys to GitHub Pages via `.github/workflows/deploy.yml` on push to `main`, on
 manual dispatch, and daily at `00:00 UTC` (08:00 Asia/Manila). Add `GEMINIKEYS`,
-`FIRECRAWL_API_KEY`, and `NASA_API_KEY` as repository secrets. The workflow runs the
-generator (prebuild) then builds and deploys.
+`FIRECRAWL_API_KEY`, and `NASA_API_KEY` as repository secrets. The workflow runs
+`npm run generate:site` explicitly, then `npm run build` (which does not fetch), and deploys.
 
 Custom domain: `phsim.rogverse.fyi` (see `public/CNAME`). Point a DNS CNAME record at
 `rpfilomeno.github.io`, then set the custom domain under Settings → Pages. The site is served

@@ -8,7 +8,6 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "prebuild": "npm run generate:site",
     "preview": "astro preview",
     "generate:site": "node --use-system-ca scripts/generate-site-data.ts",
     "test": "node --test src/lib/reboot.test.ts src/lib/newsFeed.test.ts",
