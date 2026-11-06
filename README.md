@@ -41,7 +41,7 @@ from the domain root, so no `BASE_PATH` is needed.
 
 `Dockerfile` + `docker-entrypoint.sh` provide a fully parallel path that leaves `.github`
 untouched: the container regenerates data, builds `dist/`, and force-pushes it to another
-GitHub repo's `gh-pages` branch, repeating every `PUSH_INTERVAL_HOURS` (default 24; `0` =
+GitHub repo's `main` branch, repeating every `PUSH_INTERVAL_HOURS` (default 24; `0` =
 run once and exit).
 
 Env vars (define in `.env` for local runs; mirror them into Dokploy's app environment —
@@ -49,7 +49,7 @@ Env vars (define in `.env` for local runs; mirror them into Dokploy's app enviro
 
 | Variable | Purpose |
 | -------- | ------- |
-| `DEPLOY_REPO` | Target repo, e.g. `owner/other-repo` (pushes its `gh-pages` branch) |
+| `DEPLOY_REPO` | Target repo, e.g. `owner/other-repo` (replaces its `main` branch with `dist/`) |
 | `GITHUB_TOKEN` | Fine-grained PAT with `contents: write` on the target repo |
 | `PUSH_INTERVAL_HOURS` | Hours between rebuild+push cycles (default 24, `0` = one-shot) |
 | `GEMINIKEYS`, `FIRECRAWL_API_KEY`, `NASA_API_KEY` | Same as `.env.example` |
@@ -65,7 +65,9 @@ Dokploy: create an app from this repo, build method **Dockerfile**, paste the en
 expose no port (it is a long-running task, not a server), and keep the container running —
 the entrypoint's sleep loop is the schedule.
 
-One-time on the target repo: create it, enable Pages with source = `gh-pages` branch.
+One-time on the target repo: create it, enable Pages with source = `main` branch (root).
+Note the push force-replaces the whole `main` branch with `dist/`, so keep that repo empty
+of anything else; commits carry `[skip ci]` so the PAT push won't trigger its workflows.
 
 `scripts/phivolcs-ca.pem` is a public GlobalSign intermediate that completes PHIVOLCS's
 incomplete certificate chain inside the container (via `NODE_EXTRA_CA_CERTS`).

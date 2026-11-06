@@ -1,6 +1,6 @@
 FROM node:22-bookworm-slim
 
-# git for the gh-pages push, ca-certificates for --use-system-ca fetches (PHIVOLCS chain)
+# git for the main-branch push, ca-certificates for --use-system-ca fetches (PHIVOLCS chain)
 RUN apt-get update \
   && apt-get install -y --no-install-recommends git ca-certificates \
   && rm -rf /var/lib/apt/lists/*
