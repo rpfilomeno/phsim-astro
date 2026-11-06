@@ -8,6 +8,10 @@ astro dev --background
 
 Manage the background server with `astro dev stop`, `astro dev status`, and `astro dev logs`.
 
+## Git
+
+Do not auto-push. Commit only when asked; leave pushing to the user unless explicitly requested.
+
 ## Documentation
 
 Full documentation: https://docs.astro.build

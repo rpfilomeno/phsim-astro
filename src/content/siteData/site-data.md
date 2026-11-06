@@ -1,29 +1,38 @@
 ---
-generatedAt: 2026-11-06T07:36:51.536Z
+generatedAt: 2026-11-06T09:00:32.593Z
 notice:
-  headline: "[EMERGENCY NOTICE] Iligan City Alchemist Fire Triggers Fatal Map Wipe"
-  body: A catastrophic fire hazard and crafting accident in Iligan City resulted
-    in P900k property damage and permanently eliminated two players from the
-    Republic Server.
+  headline: "[EMERGENCY NOTICE] EDSA Phase 2 Roadworks Resume Friday"
+  body: Brace for massive traffic lag and severe mobility debuffs as EDSA
+    rehabilitation works restart this Friday evening. Avoid the main highway
+    lanes if you want to save your sanity.
 sanctions:
-  - player: "Player: Iligan_Alchemist"
+  - player: "Player: benguet_builder"
     penalty: PERM BAN
-    infraction: Violating safe crafting protocols by operating an unauthorized
-      illegal firecracker sweatshop that resulted in fatal server casualties.
+    infraction: Caught by local GM patrols carrying 43kg of contraband marijuana
+      items instead of standard crafting materials.
+  - player: "Player: caloocan_lotto_teller"
+    penalty: PERM BAN
+    infraction: Abused official lotto outlet licensing to run illegal numbers game
+      exploits in the Caloocan ward.
+  - player: "Guild: cdo_syndicate"
+    penalty: "BAN: 90 DAYS"
+    infraction: Ambushed by PRO-10 server operatives for hoarding P714,000 worth of
+      unverified shabu contraband.
 gvg:
-  title: Palace Threatens Swift Veto Skill Over Budget Red Flags
-  label: SERVER ADMIN WARNING
-  body: Server admin Palace has issued a stern warning that suspicious allocations
-    hidden within the guild budget run a high risk of triggering another swift
-    presidential veto skill. Lawmakers are being advised to scrub their
-    financial builds immediately or face catastrophic server-wide nerfs.
+  title: Ombudsman Launches Raid on Payatas VIP Escort Privileges
+  label: WOE SPECIAL INVESTIGATION
+  body: The Ombudsman guild has initiated surprise inspections at the Payatas
+    facility following leaked reports of unauthorized VIP escort privileges
+    granted to a detained high-tier guild master. Server admins are cracking
+    down on corruption exploits to ensure fair justice rules apply across all
+    regional maps.
 realmStatuses:
   - region: Luzon
-    status: "[CHIEF JUSTICE LEVEL UP]"
+    status: "[EDSA REHABILITATION DEBUFFS ACTIVE]"
   - region: Visayas
-    status: "[MANGROVES BLOCK FLOOD DEBUFF]"
+    status: "[SERVER STATUS NORMAL]"
   - region: Mindanao
-    status: "[ALCHEMIST SHOP EXPLODES]"
+    status: "[CDO STING SUCCESSFUL]"
 macro:
   usdRate: 62.995
   usdDate: 2026-11-05
@@ -33,11 +42,11 @@ macro:
     ruleCurve: 198.98
     observedAt: November 06,2026 08:00:00 am
 weather:
-  temp: 32
-  feels: 35
-  humidity: 48
+  temp: 31
+  feels: 32
+  humidity: 47
   desc: Sunny
-  observedAt: 06:40 AM
+  observedAt: 08:11 AM
 history:
   title: Today in Filipino history, November 6, 1915, Nicanor Yñiguez was born in
     Maasin, Leyte
@@ -51,6 +60,13 @@ history:
     political landscape of the Philippines during the Marcos era and beyond.
   url: https://kahimyang.com/articles/3166/today-in-filipino-history-november-6-1915-nicanor-y-iguez-was-born-in-maasin-leyte
 quakes:
+  - time: 06 November 2026 - 04:38 PM
+    lat: "12.86"
+    lon: "123.05"
+    depth: "010"
+    mag: "2.3"
+    location: 022 km S 78° W of Claveria (Masbate)
+    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_083855_B1.html
   - time: 06 November 2026 - 03:11 PM
     lat: "13.68"
     lon: "120.62"
@@ -117,13 +133,6 @@ quakes:
     mag: "3.3"
     location: 024 km S 41° W of Calatagan (Batangas)
     url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_002353_B1.html
-  - time: 06 November 2026 - 06:39 AM
-    lat: "05.77"
-    lon: "125.36"
-    depth: "012"
-    mag: "2.1"
-    location: 019 km S 71° E of Glan (Sarangani)
-    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1105_223920_B1F.html
 stocks:
   gainer:
     ticker: PHES
