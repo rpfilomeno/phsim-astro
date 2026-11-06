@@ -392,6 +392,8 @@ async function fetchAsteroid(prev: Previous | null): Promise<Previous['asteroid'
     return prev?.asteroid ?? null;
   }
 }
+
+async function fetchStocks(prev: Previous | null): Promise<Stocks | null> {
   try {
     const md = await firecrawlScrape(PHILIPPINE_STOCKS_URL);
     const headerRe = /\| Stock \| Value \| Price \| Change \| %Change \|/g;
