@@ -17,6 +17,32 @@ import {
 } from '../src/lib/newsFeed.ts';
 // patches module no longer imported — categories and tag classes are dynamic
 
+// --- logging -----------------------------------------------------------------
+// Parallel calls interleave, so every line carries seconds-since-run-start.
+// Safety: keys are only ever logged as their last 6 chars (CI logs are readable).
+const T0 = Date.now();
+const since = (t: number) => ((Date.now() - t) / 1000).toFixed(1);
+const stamp = () => `[+${since(T0).padStart(5, '0')}s]`;
+const log = (msg: string) => console.log(`${stamp()} ${msg}`);
+const warn = (msg: string) => console.warn(`${stamp()} ${msg}`);
+const fail = (msg: string) => console.error(`${stamp()} ${msg}`);
+
+// --- run state (one process = one run) ---------------------------------------
+/** label → seconds spent; paired with staleSections for the summary. */
+const sectionTime = new Map<string, number>();
+const staleSections = new Set<string>();
+function markSection(label: string, t: number, stale: boolean) {
+  sectionTime.set(label, (Date.now() - t) / 1000);
+  if (stale) staleSections.add(label);
+}
+const sectionStat = (label: string) =>
+  sectionTime.has(label)
+    ? `${label} ${staleSections.has(label) ? 'STALE' : 'ok'} ${(sectionTime.get(label) ?? 0).toFixed(1)}s`
+    : `${label} n/a`;
+/** LLM usage counters — proves the rolling key rule and sizes the retry cost. */
+const llmStats = { calls: 0, attempts: 0, keyUse: new Map<string, number>() };
+const keySuffix = (key: string) => key.slice(-6);
+
 const RSS_FEED_URL = 'https://newsinfo.inquirer.net/feed';
 const FIRECRAWL_ENDPOINT = 'https://api.firecrawl.dev/v1/scrape';
 const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-8b'];
@@ -61,11 +87,11 @@ async function flashModels(): Promise<string[]> {
     const found = await discoverFlashModels(key);
     if (found.length) {
       cachedFlashModels = found;
-      console.log('[site] discovered gemini flash models: ' + found.join(', '));
+      log('[site] discovered gemini flash models: ' + found.join(', '));
       return found;
     }
   }
-  console.warn('[site] could not discover gemini models; falling back to built-in list');
+  warn('[site] could not discover gemini models; falling back to built-in list');
   cachedFlashModels = GEMINI_MODELS;
   return GEMINI_MODELS;
 }
@@ -218,6 +244,7 @@ async function attemptLlm<T>(
   const models = await flashModels();
   let lastErr = '';
   let tries = 0;
+  llmStats.calls++;
   // Bound the loop: each pass over the model list either finds a live model or
   // marks it dead, so it terminates once every model is dead.
   for (let i = 0; i < models.length * (MAX_LLM_ATTEMPTS + 1) && tries < MAX_LLM_ATTEMPTS; i++) {
@@ -230,6 +257,12 @@ async function attemptLlm<T>(
     const key = keys[geminiKeyCursor % keys.length];
     geminiKeyCursor = (geminiKeyCursor + 1) % keys.length;
     tries++;
+    llmStats.attempts++;
+    const sfx = keySuffix(key);
+    llmStats.keyUse.set(sfx, (llmStats.keyUse.get(sfx) ?? 0) + 1);
+    const who = `try ${tries}/${MAX_LLM_ATTEMPTS} ${model} key ...${sfx}`;
+    const note = tries < MAX_LLM_ATTEMPTS ? ', retry' : '';
+    const t = Date.now();
     try {
       const res = await fetch(
         'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(key),
@@ -250,12 +283,14 @@ async function attemptLlm<T>(
       );
       if (!res.ok) {
         const detail = res.status === 429 ? 'rate-limited' : (await res.text()).slice(0, 200);
-        lastErr = `gemini ${model} HTTP ${res.status} (${detail}) key ...${key.slice(-6)}`;
+        lastErr = `gemini ${model} HTTP ${res.status} (${detail}) key ...${sfx}`;
         if (res.status === 429 || res.status === 404) {
           // Persistent for this run: skip it for every later call, don't burn a try.
           deadModels.add(model);
-          console.warn(`[site] model ${model} marked dead for this run (${res.status})`);
+          warn(`[llm] ${who} → HTTP ${res.status}; model marked dead for this run`);
           tries--;
+        } else {
+          warn(`[llm] ${who} → HTTP ${res.status}${note}`);
         }
         continue;
       }
@@ -265,21 +300,33 @@ async function attemptLlm<T>(
       if (!text) {
         const reason = data?.candidates?.[0]?.finishReason ?? data?.promptFeedback?.blockReason ?? 'no content';
         lastErr = `gemini ${model} returned no content (${reason})`;
+        warn(`[llm] ${who} → no content (${reason})${note}`);
         continue;
       }
-      return extractJson<T>(text);
+      const out = extractJson<T>(text);
+      log(`[llm] ok (${since(t)}s) ${model} key ...${sfx}`);
+      return out;
     } catch (err) {
       lastErr = `gemini ${model}: ${message(err)}`;
+      warn(`[llm] ${who} → ${message(err)}${note}`);
     }
   }
-  throw new Error(lastErr || `gemini failed after ${MAX_LLM_ATTEMPTS} attempts`);
+  if (!lastErr) {
+    throw new Error(`gemini: every discovered model is dead for this run (${[...deadModels].join(', ') || 'none'})`);
+  }
+  throw new Error(`gemini failed after ${tries} attempts: ${lastErr}`);
 }
 
 async function attempt<T>(label: string, fn: () => Promise<T>, fallback: T): Promise<T> {
+  const t = Date.now();
   try {
-    return await fn();
+    const out = await fn();
+    markSection(label, t, false);
+    log(`[build] ${label} ok (${since(t)}s)`);
+    return out;
   } catch (err) {
-    console.warn(`[site] ${label} failed (${message(err)}); keeping previous value`);
+    markSection(label, t, true);
+    warn(`[build] ${label} failed (${message(err)}); keeping previous value`);
     return fallback;
   }
 }
@@ -291,10 +338,10 @@ async function loadPrevious(): Promise<Previous | null> {
     const match = raw.match(/^---\n([\s\S]*?)\n---/);
     if (!match) throw new Error('no frontmatter');
     const data = parse(match[1]) as Previous;
-    console.log('[site] loaded previous output as stale-data cache');
+    log('[site] loaded previous output as stale-data cache');
     return data;
   } catch (err) {
-    console.warn(`[site] no previous output (${message(err)})`);
+    warn(`[site] no previous output (${message(err)})`);
     return null;
   }
 }
@@ -302,6 +349,7 @@ async function loadPrevious(): Promise<Previous | null> {
 const phtDay = (d: Date | string) => new Date(d).toLocaleDateString('sv-SE', { timeZone: 'Asia/Manila' });
 
 async function fetchMacro(prev: Previous | null): Promise<Macro | null> {
+  const t = Date.now();
   try {
     const fx = await fetch(FX_ENDPOINT, { signal: AbortSignal.timeout(15_000) });
     if (!fx.ok) throw new Error(`frankfurter HTTP ${fx.status}`);
@@ -309,6 +357,7 @@ async function fetchMacro(prev: Previous | null): Promise<Macro | null> {
     const usdRate = fxData?.rates?.PHP;
     if (typeof usdRate !== 'number') throw new Error('no PHP rate in reply');
     let angat: DamLevel | null = null;
+    const angatT = Date.now();
     try {
       const res = await fetch(PAGASA_ENDPOINT, {
         headers: { 'User-Agent': UA },
@@ -317,18 +366,25 @@ async function fetchMacro(prev: Previous | null): Promise<Macro | null> {
       if (!res.ok) throw new Error(`pagasa HTTP ${res.status}`);
       angat = parseDamLevel(await res.text());
       if (!angat) throw new Error('no Angat row');
+      markSection('angat', angatT, false);
+      log(`[fetch] angat ok (${since(angatT)}s, ${angat.level}m)`);
     } catch (err) {
-      console.warn(`[site] angat failed (${message(err)}); keeping previous value`);
+      markSection('angat', angatT, true);
+      warn(`[fetch] angat failed (${message(err)}); keeping previous value`);
       angat = prev?.macro?.angat ?? null;
     }
+    markSection('macro', t, false);
+    log(`[fetch] macro ok (${since(t)}s, ${usdRate} PHP/USD)`);
     return { usdRate, usdDate: fxData.date ?? '', angat };
   } catch (err) {
-    console.warn(`[site] macro failed (${message(err)}); keeping previous value`);
+    markSection('macro', t, true);
+    warn(`[fetch] macro failed (${message(err)}); keeping previous value`);
     return prev?.macro ?? null;
   }
 }
 
 async function fetchWeather(prev: Previous | null): Promise<Weather | null> {
+  const t = Date.now();
   try {
     const res = await fetch(WEATHER_ENDPOINT, {
       headers: { 'User-Agent': UA },
@@ -344,14 +400,18 @@ async function fetchWeather(prev: Previous | null): Promise<Weather | null> {
     if (!Number.isFinite(temp) || !Number.isFinite(feels) || !Number.isFinite(humidity) || !desc) {
       throw new Error('incomplete current_condition');
     }
+    markSection('weather', t, false);
+    log(`[fetch] weather ok (${since(t)}s, ${temp}°C ${desc})`);
     return { temp, feels, humidity, desc, observedAt: cc?.observation_time ?? '' };
   } catch (err) {
-    console.warn(`[site] weather failed (${message(err)}); keeping previous value`);
+    markSection('weather', t, true);
+    warn(`[fetch] weather failed (${message(err)}); keeping previous value`);
     return prev?.weather ?? null;
   }
 }
 
 async function fetchHistory(prev: Previous | null): Promise<HistoryBorn | null> {
+  const t = Date.now();
   try {
     const res = await fetch(`${HISTORY_ENDPOINT}/${phtDay(new Date())}`, {
       headers: { 'User-Agent': UA },
@@ -360,9 +420,12 @@ async function fetchHistory(prev: Previous | null): Promise<HistoryBorn | null> 
     if (!res.ok) throw new Error(`kahimyang HTTP ${res.status}`);
     const entry = parseHistoryBorn(await res.json());
     if (!entry) throw new Error('no birth entry for today');
+    markSection('history', t, false);
+    log(`[fetch] history ok (${since(t)}s)`);
     return entry;
   } catch (err) {
-    console.warn(`[site] history failed (${message(err)}); keeping previous value`);
+    markSection('history', t, true);
+    warn(`[fetch] history failed (${message(err)}); keeping previous value`);
     // A stale entry is only shown while it is still today's entry — otherwise
     // the card would claim yesterday's person was born today.
     return prev && phtDay(prev.generatedAt) === phtDay(new Date()) ? prev.history : null;
@@ -370,6 +433,7 @@ async function fetchHistory(prev: Previous | null): Promise<HistoryBorn | null> 
 }
 
 async function fetchQuakes(prev: Previous | null): Promise<Quake[] | null> {
+  const t = Date.now();
   try {
     const res = await fetch(QUAKE_ENDPOINT, {
       headers: { 'User-Agent': UA },
@@ -378,18 +442,23 @@ async function fetchQuakes(prev: Previous | null): Promise<Quake[] | null> {
     if (!res.ok) throw new Error(`phivolcs HTTP ${res.status}`);
     const quakes = parseQuakes(await res.text());
     if (quakes.length === 0) throw new Error('no quake rows');
+    markSection('quakes', t, false);
+    log(`[fetch] quakes ok (${since(t)}s, ${quakes.length} rows)`);
     // The page lists ~5 days of events; the newest rows come first.
     return quakes.slice(0, 10);
   } catch (err) {
-    console.warn(`[site] quakes failed (${message(err)}); keeping previous value`);
+    markSection('quakes', t, true);
+    warn(`[fetch] quakes failed (${message(err)}); keeping previous value`);
     return prev?.quakes ?? null;
   }
 }
 
 async function fetchAsteroid(prev: Previous | null): Promise<Previous['asteroid']> {
+  const t = Date.now();
   const key = process.env.NASA_API_KEY;
   if (!key) {
-    console.warn('[site] NASA_API_KEY missing; skipping asteroid feed');
+    markSection('asteroid', t, true);
+    warn('[site] NASA_API_KEY missing; skipping asteroid feed');
     return prev?.asteroid ?? null;
   }
   try {
@@ -423,7 +492,7 @@ async function fetchAsteroid(prev: Previous | null): Promise<Previous['asteroid'
     const ca = best.close_approach_data[0];
     const diam = best.estimated_diameter?.kilometers;
     const diameter = Number(diam?.estimated_diameter_max ?? diam?.estimated_diameter_min ?? 0);
-    return {
+    const neo = {
       name: String(best.name ?? '').replace(/[()]/g, '').trim(),
       diameter: Number.isFinite(diameter) ? diameter : 0,
       missDistance: Number(ca.miss_distance.kilometers),
@@ -432,13 +501,18 @@ async function fetchAsteroid(prev: Previous | null): Promise<Previous['asteroid'
       approachDate: String(ca.close_approach_date_full ?? ca.close_approach_date ?? today),
       url: String(best.nasa_jpl_url ?? ''),
     };
+    markSection('asteroid', t, false);
+    log(`[fetch] asteroid ok (${since(t)}s, ${neo.name})`);
+    return neo;
   } catch (err) {
-    console.warn(`[site] asteroid feed failed (${message(err)}); keeping previous value`);
+    markSection('asteroid', t, true);
+    warn(`[fetch] asteroid failed (${message(err)}); keeping previous value`);
     return prev?.asteroid ?? null;
   }
 }
 
 async function fetchStocks(prev: Previous | null): Promise<Stocks | null> {
+  const t = Date.now();
   try {
     const md = await firecrawlScrape(PHILIPPINE_STOCKS_URL);
     const headerRe = /\| Stock \| Value \| Price \| Change \| %Change \|/g;
@@ -459,9 +533,12 @@ async function fetchStocks(prev: Previous | null): Promise<Stocks | null> {
       if (match) loser = { ticker: match[1], change: match[2] };
     }
     if (!gainer && !loser) throw new Error('no stock data found');
+    markSection('stocks', t, false);
+    log(`[fetch] stocks ok (${since(t)}s, ${gainer?.ticker ?? 'n/a'} / ${loser?.ticker ?? 'n/a'})`);
     return { gainer, loser };
   } catch (err) {
-    console.warn(`[site] stocks failed (${message(err)}); keeping previous value`);
+    markSection('stocks', t, true);
+    warn(`[fetch] stocks failed (${message(err)}); keeping previous value`);
     return prev?.stocks ?? null;
   }
 }
@@ -679,41 +756,43 @@ async function buildRealm(news: NewsItem[]): Promise<RealmStatus[] | null> {
 
 async function main() {
   if (!process.env.GEMINIKEYS) {
-    console.warn('[site] GEMINIKEYS missing; skipping generation, keeping existing data files');
+    warn('[site] GEMINIKEYS missing; skipping generation, keeping existing data files');
     return;
   }
   if (!process.env.FIRECRAWL_API_KEY || process.env.FIRECRAWL_API_KEY === 'fc-your-firecrawl-key') {
-    console.warn('[site] FIRECRAWL_API_KEY missing or placeholder; stocks feed will use previous value');
+    warn('[site] FIRECRAWL_API_KEY missing or placeholder; stocks feed will use previous value');
   }
   await flashModels(); // discover once up-front so parallel calls don't race model discovery
   const prev = await loadPrevious();
   let items: FeedItem[] = [];
   try {
-    console.log(`[news] fetching RSS ${RSS_FEED_URL}…`);
+    log(`[news] fetching RSS ${RSS_FEED_URL}…`);
     const res = await fetch(RSS_FEED_URL, {
       headers: { 'User-Agent': UA },
       signal: AbortSignal.timeout(30_000),
     });
     if (!res.ok) throw new Error(`rss HTTP ${res.status}`);
     items = parseFeedItems(await res.text()).slice(0, LIMIT);
-    console.log(`[news] found ${items.length} RSS items`);
+    log(`[news] found ${items.length} RSS items`);
   } catch (err) {
-    console.warn(`[news] RSS failed (${message(err)}); keeping previous news.ts`);
+    warn(`[news] RSS failed (${message(err)}); keeping previous news.ts`);
     items = [];
   }
   if (items.length === 0) {
-    console.warn('[news] no articles; keeping previous news.ts');
+    warn('[news] no articles; keeping previous news.ts');
   } else {
-    console.log(`[news] using ${items.length} RSS descriptions`);
+    log(`[news] using ${items.length} RSS descriptions`);
   }
 
   const contents = new Map<string, string>();
+  const newsT = Date.now();
   const drafts = await Promise.all(
     items.map(async (item) => {
       const content = item.description.replace(/<[^>]+>/g, ' ');
       contents.set(item.link, content);
+      const itemT = Date.now();
       try {
-        console.log(`[news] rewriting: ${item.title.slice(0, 60)}…`);
+        log(`[news] rewriting: ${item.title.slice(0, 60)}…`);
         const draft = await llmJson<WireDraft>(
           NEWS_SYSTEM,
           `Headline: ${item.title}\nPublished: ${item.pubDate}\nSource: ${item.link}\n\nArticle:\n${(content || item.title).slice(0, 4000)}`,
@@ -729,6 +808,7 @@ async function main() {
           },
         );
         if (!draft.tag || !draft.title || !draft.summary) throw new Error('llm reply missing fields');
+        log(`[news] ok (${since(itemT)}s): ${draft.title.slice(0, 60)}`);
         const published = new Date(item.pubDate);
         return {
           slug: slugFromUrl(item.link),
@@ -740,16 +820,19 @@ async function main() {
           publishedAt: Number.isNaN(published.getTime()) ? item.pubDate : published.toISOString(),
         };
       } catch (err) {
-        console.warn(`[site] skipped (${message(err)}): ${item.title}`);
+        warn(`[news] skipped (${message(err)}): ${item.title}`);
         return null;
       }
     }),
   );
   // filter keeps feed order (newest first) regardless of completion order
   const news: NewsItem[] = drafts.filter((n): n is NewsItem => n !== null);
+  markSection('news', newsT, news.length === 0);
   if (news.length === 0) {
-    console.warn('[news] no news items rewritten; keeping previous news.ts');
+    if (drafts.length > 0) warn(`[news] all ${drafts.length} rewrites failed; keeping previous news.ts`);
   } else {
+    const skipped = drafts.length - news.length;
+    log(`[news] rewrote ${news.length}/${drafts.length} in ${since(newsT)}s${skipped ? ` (${skipped} skipped)` : ''}`);
     const generatedAt = new Date().toISOString();
     // Keep only the 100 most recent news markdown files
     const { readdirSync, unlinkSync, statSync } = await import('node:fs');
@@ -767,7 +850,7 @@ async function main() {
       const frontmatter = stringify({ ...item, generatedAt });
       writeFileSync(new URL(`${slug}.md`, NEWS_OUTPUT_DIR), `---\n${frontmatter}---\n\n${item.summary}\n`);
     }
-    console.log(`[site] wrote ${news.length} news markdown files`);
+    log(`[site] wrote ${news.length} news markdown files`);
   }
   const macro = await fetchMacro(prev);
   const weather = await fetchWeather(prev);
@@ -782,10 +865,6 @@ async function main() {
     attempt('gvg', () => buildGvg(news), prev?.gvg ?? null),
     attempt('realm', () => buildRealm(news), prev?.realmStatuses ?? null),
   ]);
-  console.log(
-    `[site] patches: ${patches.length}, notice: ${notice ? 'ok' : 'none'}, sanctions: ${sanctions.length}, gvg: ${gvg ? 'ok' : 'none'}, realm: ${realm ? 'ok' : 'none'}, macro: ${macro ? `${macro.usdRate}${macro.angat ? ` / Angat ${macro.angat.level}m` : ''}` : 'none'}, weather: ${weather ? `${weather.temp}°C ${weather.desc}` : 'none'}, history: ${history ? 'ok' : 'none'}, quakes: ${quakes ? `${quakes.length} (M${quakes[0].mag})` : 'none'}`,
-  );
-
   // Write generated patches as individual markdown files (clear old ones first)
   const patchesDir = new URL('../src/content/patches/', import.meta.url);
   try {
@@ -802,7 +881,7 @@ async function main() {
     const slug = (p.code || p.category || 'patch').toLowerCase().replace(/[^a-z0-9-]/g, '-');
     writeFileSync(new URL(`gen-${slug}.md`, patchesDir), `---\n${frontmatter}---\n\n${p.body}\n`);
   }
-  if (patches.length) console.log(`[site] wrote ${patches.length} generated patch markdown files`);
+  if (patches.length) log(`[site] wrote ${patches.length} generated patch markdown files`);
 
   const generatedAt = new Date().toISOString();
   const siteData = {
@@ -820,11 +899,35 @@ async function main() {
   };
   const frontmatter = stringify(siteData);
   writeFileSync(SITE_OUTPUT, `---\n${frontmatter}---\n\nGenerated site data.\n`);
-  console.log(`[site] wrote src/content/news/news.md (${news.length} items) and src/content/siteData/site-data.md`);
+  log(`[site] wrote src/content/news/news.md (${news.length} items) and src/content/siteData/site-data.md`);
+
+  // One block to read (or grep) after any run: timing, freshness, key usage.
+  const keysNow = geminiKeys();
+  const newsStat =
+    news.length === 0
+      ? `kept previous (${drafts.length ? `all ${drafts.length} rewrites failed` : 'no RSS items'})`
+      : `${news.length}/${drafts.length} rewritten${drafts.length - news.length ? ` (${drafts.length - news.length} skipped)` : ''} · ${(
+          sectionTime.get('news') ?? 0
+        ).toFixed(1)}s`;
+  log(
+    [
+      `[site] ── run summary ── ${since(T0)}s total`,
+      `[site]   news     ${newsStat}`,
+      `[site]   builds   ${['patches', 'notice', 'sanctions', 'gvg', 'realm'].map(sectionStat).join(' · ')}`,
+      `[site]   fetches  ${['macro', 'angat', 'weather', 'history', 'quakes', 'stocks', 'asteroid'].map(sectionStat).join(' · ')}`,
+      `[site]   llm      ${llmStats.calls} calls / ${llmStats.attempts} attempts · keys ${
+        keysNow.length ? keysNow.map((k) => `...${keySuffix(k)}:${llmStats.keyUse.get(keySuffix(k)) ?? 0}`).join(' ') : 'none'
+      } · dead ${[...deadModels].join(', ') || 'none'}`,
+      `[site]   stale    ${staleSections.size ? [...staleSections].join(', ') : 'none'}`,
+      `[site]   output   ${news.length} news · ${patches.length} patches · macro ${macro?.usdRate ?? '—'}${
+        macro?.angat ? ` / Angat ${macro.angat.level}m` : ''
+      } · weather ${weather ? `${weather.temp}°C ${weather.desc}` : '—'} · quakes ${quakes?.length ?? 0} · generatedAt ${generatedAt}`,
+    ].join('\n'),
+  );
 }
 
 main().catch((err) => {
-  console.error(`[site] ${err instanceof Error ? (err.stack ?? err.message) : err}`);
+  fail(`[site] ${err instanceof Error ? (err.stack ?? err.message) : err}`);
   process.exitCode = 1;
 });
 

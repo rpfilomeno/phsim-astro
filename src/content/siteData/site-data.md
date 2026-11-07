@@ -1,10 +1,9 @@
 ---
-generatedAt: 2026-11-07T02:06:58.093Z
+generatedAt: 2026-11-07T03:21:54.267Z
 notice:
-  headline: "[EMERGENCY NOTICE] Fire Hazard Spawns Surge in Northern Mindanao"
-  body: Extreme heat conditions have triggered a 54% spike in fire environmental
-    hazards across the Northern Mindanao map. Players are advised to equip
-    fire-resist gear and avoid AFKing in high-risk zones.
+  headline: "[EMERGENCY NOTICE] Nationwide 'Wet' Debuff and Shear Line Active"
+  body: GM Pagasa warns all players that Amihan and a Shear Line are dropping
+    heavy rains across the map. Expect zero visibility and slippery terrain.
 sanctions:
   - player: "Player: Loren_Legarda"
     penalty: PERM BAN
@@ -15,19 +14,19 @@ sanctions:
     infraction: Providing unauthorized assist buffs and special treatment to a
       high-ranking player inside the New Quezon City Jail instance.
 gvg:
-  title: Palace probes special buffs for VIP prisoner
-  label: SERVER EQUITY VIOLATION
-  body: Administrators are investigating reports that a high-ranking player
-    received illicit assist buffs while locked in the New Quezon City Jail
-    instance. This exploit of server rules has triggered a formal inquiry into
-    how the guild leader permitted such blatant special treatment.
+  title: Councilor Survives Ambush in Maguindanao del Sur Raid
+  label: GUILD WARFARE ALERT
+  body: A high-ranking player in the Maguindanao del Sur guild narrowly escaped a
+    lethal ambush by unidentified hostiles in Barangay Liong. The target
+    survived despite suffering multiple critical debuffs from incoming
+    projectiles during the skirmish.
 realmStatuses:
   - region: Luzon
-    status: "[RAIN DEBUFFS ACTIVE]"
+    status: "[TAINTED SEAFOOD DETECTED]"
   - region: Visayas
-    status: "[SERVE AND PROTECT]"
+    status: "[SARDINES FISHING BAN]"
   - region: Mindanao
-    status: "[EXTREME FIRE HAZARD]"
+    status: "[HEATWAVE FIRE SURGE]"
 macro:
   usdRate: 63.017
   usdDate: 2026-11-06
@@ -37,11 +36,11 @@ macro:
     ruleCurve: 199.26
     observedAt: November 07,2026 08:00:00 am
 weather:
-  temp: 28
-  feels: 30
-  humidity: 69
+  temp: 30
+  feels: 33
+  humidity: 59
   desc: Patchy rain nearby
-  observedAt: 12:42 AM
+  observedAt: 02:12 AM
 history:
   title: Today in Philippine history, November 7, 1975, the Metropolitan Manila
     Commission was created
@@ -51,6 +50,13 @@ history:
     municipalities into an integrated unit.
   url: https://kahimyang.com/kauswagan/articles/2440/today-in-philippine-history-november-7-1975-the-metropolitan-manila-commission-was-created
 quakes:
+  - time: 07 November 2026 - 11:01 AM
+    lat: "13.63"
+    lon: "120.66"
+    depth: "148"
+    mag: "1.8"
+    location: 022 km N 20° W of Abra De Ilog (Occidental Mindoro)
+    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1107_030131_B1.html
   - time: 07 November 2026 - 09:26 AM
     lat: "06.04"
     lon: "125.01"
@@ -109,19 +115,12 @@ quakes:
       Occidental)
     url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_225922_B1F.html
   - time: 07 November 2026 - 06:25 AM
-    lat: "13.37"
-    lon: "124.30"
-    depth: "024"
+    lat: "13.41"
+    lon: "124.24"
+    depth: "013"
     mag: "3.9"
-    location: 024 km S 17° E of Virac (Catanduanes)
-    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_222518_B2F.html
-  - time: 07 November 2026 - 05:46 AM
-    lat: "10.38"
-    lon: "126.25"
-    depth: "034"
-    mag: "1.6"
-    location: 044 km N 25° E of Burgos (Surigao Del Norte)
-    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_214604_B1.html
+    location: 018 km S 04° E of Virac (Catanduanes)
+    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_222518_B3F.html
 stocks:
   gainer:
     ticker: PHES
