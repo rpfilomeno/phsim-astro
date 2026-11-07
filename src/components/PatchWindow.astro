@@ -1,11 +1,21 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import { rebootWindow, rebootScheduleLabel, nextRebootDateLabel } from '../lib/reboot';
 
 const allPatchesRaw = await getCollection('patches');
 const allPatches = allPatchesRaw.map((p) => p.data);
 
 const patchTitle = allPatches.map((p) => p.tag).join(' & ') || 'Server Patches';
+
+// Log filename stamped with when the data was generated (PHT), e.g. 20261107-0322.
+const generatedAt = (await getEntry('siteData', 'site-data'))?.data.generatedAt ?? '';
+const generated = generatedAt ? new Date(generatedAt) : new Date(NaN);
+const stamp = Number.isNaN(generated.getTime())
+  ? ''
+  : `${generated.toLocaleDateString('sv-SE', { timeZone: 'Asia/Manila' }).replaceAll('-', '')}-${generated.toLocaleTimeString('sv-SE', { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit' }).replace(':', '')}`;
+const patchLogName = stamp
+  ? `PH_PatchLog_Episode_7107_Archipelago_${stamp}.exe`
+  : 'PH_PatchLog_Episode_7107_Archipelago.exe';
 
 const rebootLabel = rebootScheduleLabel();
 
@@ -38,7 +48,7 @@ const toneClass = {
       <span class="inline-block w-3 h-3 bg-secondary-container rounded-full shrink-0" aria-hidden="true"
       ></span>
       <span class="font-title-md text-body-sm tracking-wide font-bold truncate"
-        >PH_PatchLog_Episode_7107_Archipelago.exe - [Midgarts Philippines Server
+        >{patchLogName} - [Midgarts Philippines Server
         Registry]</span
       >
     </div>
