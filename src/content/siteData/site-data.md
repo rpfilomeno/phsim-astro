@@ -1,138 +1,127 @@
 ---
-generatedAt: 2026-11-06T09:00:32.593Z
+generatedAt: 2026-11-07T02:06:58.093Z
 notice:
-  headline: "[EMERGENCY NOTICE] EDSA Phase 2 Roadworks Resume Friday"
-  body: Brace for massive traffic lag and severe mobility debuffs as EDSA
-    rehabilitation works restart this Friday evening. Avoid the main highway
-    lanes if you want to save your sanity.
+  headline: "[EMERGENCY NOTICE] Fire Hazard Spawns Surge in Northern Mindanao"
+  body: Extreme heat conditions have triggered a 54% spike in fire environmental
+    hazards across the Northern Mindanao map. Players are advised to equip
+    fire-resist gear and avoid AFKing in high-risk zones.
 sanctions:
-  - player: "Player: benguet_builder"
+  - player: "Player: Loren_Legarda"
     penalty: PERM BAN
-    infraction: Caught by local GM patrols carrying 43kg of contraband marijuana
-      items instead of standard crafting materials.
-  - player: "Player: caloocan_lotto_teller"
-    penalty: PERM BAN
-    infraction: Abused official lotto outlet licensing to run illegal numbers game
-      exploits in the Caloocan ward.
-  - player: "Guild: cdo_syndicate"
-    penalty: "BAN: 90 DAYS"
-    infraction: Ambushed by PRO-10 server operatives for hoarding P714,000 worth of
-      unverified shabu contraband.
+    infraction: Unauthorized dumping of cremated pet remains in San Jose del Monte
+      triggered a severe environmental violation alert.
+  - player: "Guild: Jail_Instance_Admins"
+    penalty: "BAN: 30 DAYS"
+    infraction: Providing unauthorized assist buffs and special treatment to a
+      high-ranking player inside the New Quezon City Jail instance.
 gvg:
-  title: Ombudsman Launches Raid on Payatas VIP Escort Privileges
-  label: WOE SPECIAL INVESTIGATION
-  body: The Ombudsman guild has initiated surprise inspections at the Payatas
-    facility following leaked reports of unauthorized VIP escort privileges
-    granted to a detained high-tier guild master. Server admins are cracking
-    down on corruption exploits to ensure fair justice rules apply across all
-    regional maps.
+  title: Palace probes special buffs for VIP prisoner
+  label: SERVER EQUITY VIOLATION
+  body: Administrators are investigating reports that a high-ranking player
+    received illicit assist buffs while locked in the New Quezon City Jail
+    instance. This exploit of server rules has triggered a formal inquiry into
+    how the guild leader permitted such blatant special treatment.
 realmStatuses:
   - region: Luzon
-    status: "[EDSA REHABILITATION DEBUFFS ACTIVE]"
+    status: "[RAIN DEBUFFS ACTIVE]"
   - region: Visayas
-    status: "[SERVER STATUS NORMAL]"
+    status: "[SERVE AND PROTECT]"
   - region: Mindanao
-    status: "[CDO STING SUCCESSFUL]"
+    status: "[EXTREME FIRE HAZARD]"
 macro:
-  usdRate: 62.995
-  usdDate: 2026-11-05
+  usdRate: 63.017
+  usdDate: 2026-11-06
   angat:
-    level: 208.75
+    level: 208.61
     nhwl: 210
-    ruleCurve: 198.98
-    observedAt: November 06,2026 08:00:00 am
+    ruleCurve: 199.26
+    observedAt: November 07,2026 08:00:00 am
 weather:
-  temp: 31
-  feels: 32
-  humidity: 47
-  desc: Sunny
-  observedAt: 08:11 AM
+  temp: 28
+  feels: 30
+  humidity: 69
+  desc: Patchy rain nearby
+  observedAt: 12:42 AM
 history:
-  title: Today in Filipino history, November 6, 1915, Nicanor Yñiguez was born in
-    Maasin, Leyte
-  body: Nicanor Espina Yñiguez was a towering figure in Philippine politics, best
-    remembered as the "Father of Southern Leyte" for his pivotal role in
-    creating the province. A lawyer, legislator, and Speaker of the Regular
-    Batasang Pambansa from 1984 to 1986, Yñiguez's career spanned decades of
-    service marked by significant legislative achievements and complex political
-    affiliations. His life, rooted in Maasin, Southern Leyte, reflects a blend
-    of dedication to public welfare and navigation through the turbulent
-    political landscape of the Philippines during the Marcos era and beyond.
-  url: https://kahimyang.com/articles/3166/today-in-filipino-history-november-6-1915-nicanor-y-iguez-was-born-in-maasin-leyte
+  title: Today in Philippine history, November 7, 1975, the Metropolitan Manila
+    Commission was created
+  body: On November 7, 1975, President Ferdinand E. Marcos signed Presidential
+    Decree No. 824, s. 1975 creating the Metropolitan Manila Commission (MMC)
+    which restructured the local governments of four cities and 13
+    municipalities into an integrated unit.
+  url: https://kahimyang.com/kauswagan/articles/2440/today-in-philippine-history-november-7-1975-the-metropolitan-manila-commission-was-created
 quakes:
-  - time: 06 November 2026 - 04:38 PM
-    lat: "12.86"
-    lon: "123.05"
-    depth: "010"
-    mag: "2.3"
-    location: 022 km S 78° W of Claveria (Masbate)
-    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_083855_B1.html
-  - time: 06 November 2026 - 03:11 PM
-    lat: "13.68"
-    lon: "120.62"
-    depth: "109"
-    mag: "1.6"
-    location: 017 km S 06° W of Calatagan (Batangas)
-    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_071143_B1.html
-  - time: 06 November 2026 - 02:28 PM
-    lat: "05.25"
-    lon: "125.17"
-    depth: "019"
-    mag: "4.8"
-    location: 033 km S 57° W of Balut Island (Municipality Of Sarangani) (Davao
-      Occidental)
-    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_062824_B2F.html
-  - time: 06 November 2026 - 01:38 PM
-    lat: "12.46"
-    lon: "120.84"
-    depth: "007"
-    mag: "1.8"
-    location: 014 km S 89° W of Rizal (Occidental Mindoro)
-    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_053809_B1.html
-  - time: 06 November 2026 - 12:27 PM
-    lat: "05.35"
-    lon: "125.26"
-    depth: "033"
-    mag: "1.9"
-    location: 019 km S 70° W of Balut Island (Municipality Of Sarangani) (Davao
-      Occidental)
-    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_042732_B1F.html
-  - time: 06 November 2026 - 11:08 AM
-    lat: "05.49"
-    lon: "125.16"
-    depth: "017"
-    mag: "2.5"
-    location: 030 km N 74° W of Balut Island (Municipality Of Sarangani) (Davao
-      Occidental)
-    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_030834_B1F.html
-  - time: 06 November 2026 - 10:52 AM
-    lat: "09.75"
-    lon: "122.49"
-    depth: "027"
-    mag: "1.8"
-    location: 006 km S 75° E of City Of Sipalay (Negros Occidental)
-    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_025228_B1.html
-  - time: 06 November 2026 - 10:15 AM
-    lat: "16.13"
-    lon: "121.71"
+  - time: 07 November 2026 - 09:26 AM
+    lat: "06.04"
+    lon: "125.01"
     depth: "025"
-    mag: "1.8"
-    location: 015 km S 48° E of Nagtipunan (Quirino)
-    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_021536_B1.html
-  - time: 06 November 2026 - 09:56 AM
-    lat: "05.97"
-    lon: "125.47"
-    depth: "025"
-    mag: "1.6"
-    location: 020 km S 90° E of Malapatan (Sarangani)
-    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_0156_B1.html
-  - time: 06 November 2026 - 08:23 AM
-    lat: "13.67"
-    lon: "120.49"
-    depth: "097"
+    mag: "1.5"
+    location: 020 km N 04° E of Maasim (Sarangani)
+    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1107_012644_B1F.html
+  - time: 07 November 2026 - 09:20 AM
+    lat: "12.13"
+    lon: "123.91"
+    depth: "004"
     mag: "3.3"
-    location: 024 km S 41° W of Calatagan (Batangas)
-    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_002353_B1.html
+    location: 002 km S 46° W of Palanas (Masbate)
+    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1107_012018_B2F.html
+  - time: 07 November 2026 - 08:46 AM
+    lat: "06.14"
+    lon: "124.31"
+    depth: "033"
+    mag: "1.2"
+    location: 016 km S 62° E of Palimbang (Sultan Kudarat)
+    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1107_004656_B1.html
+  - time: 07 November 2026 - 08:38 AM
+    lat: "07.66"
+    lon: "126.10"
+    depth: "021"
+    mag: "2.4"
+    location: 002 km S 73° E of Compostela (Davao De Oro)
+    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1107_003840_B1.html
+  - time: 07 November 2026 - 08:25 AM
+    lat: "12.96"
+    lon: "123.06"
+    depth: "005"
+    mag: "1.8"
+    location: 020 km S 25° E of San Pascual (Masbate)
+    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1107_002530_B1.html
+  - time: 07 November 2026 - 08:20 AM
+    lat: "14.25"
+    lon: "120.17"
+    depth: "041"
+    mag: "1.8"
+    location: 040 km S 59° W of Mariveles (Bataan)
+    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1107_002032_B1.html
+  - time: 07 November 2026 - 07:29 AM
+    lat: "06.46"
+    lon: "126.30"
+    depth: "130"
+    mag: "2.1"
+    location: 033 km S 49° E of Governor Generoso (Davao Oriental)
+    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_232948_B1.html
+  - time: 07 November 2026 - 06:59 AM
+    lat: "05.38"
+    lon: "125.28"
+    depth: "032"
+    mag: "1.8"
+    location: 016 km S 77° W of Balut Island (Municipality Of Sarangani) (Davao
+      Occidental)
+    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_225922_B1F.html
+  - time: 07 November 2026 - 06:25 AM
+    lat: "13.37"
+    lon: "124.30"
+    depth: "024"
+    mag: "3.9"
+    location: 024 km S 17° E of Virac (Catanduanes)
+    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_222518_B2F.html
+  - time: 07 November 2026 - 05:46 AM
+    lat: "10.38"
+    lon: "126.25"
+    depth: "034"
+    mag: "1.6"
+    location: 044 km N 25° E of Burgos (Surigao Del Norte)
+    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_214604_B1.html
 stocks:
   gainer:
     ticker: PHES
@@ -141,13 +130,13 @@ stocks:
     ticker: ABSP
     change: -22.68%
 asteroid:
-  name: 2001 KF54
-  diameter: 0.648694146
-  missDistance: 7243783.810090054
-  velocity: 16.4249116254
+  name: 2012 PP28
+  diameter: 0.8318403423
+  missDistance: 30294800.03002776
+  velocity: 12.5784401457
   hazardous: true
-  approachDate: 2026-Nov-06 03:38
-  url: https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=3076814
+  approachDate: 2026-Nov-07 14:30
+  url: https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=3607667
 ---
 
 Generated site data.

@@ -66,6 +66,7 @@ async function flashModels(): Promise<string[]> {
     }
   }
   console.warn('[site] could not discover gemini models; falling back to built-in list');
+  cachedFlashModels = GEMINI_MODELS;
   return GEMINI_MODELS;
 }
 const FX_ENDPOINT = 'https://api.frankfurter.dev/v1/latest?base=USD&quotes=PHP';
@@ -164,71 +165,114 @@ type Previous = {
   stocks: Stocks | null;
 };
 
+const MAX_LLM_ATTEMPTS = 3;
+
+/** Run fn through at most n concurrent slots. */
+function pLimit(n: number) {
+  let active = 0;
+  const queue: (() => void)[] = [];
+  const runNext = () => {
+    while (active < n && queue.length) {
+      active++;
+      queue.shift()!();
+    }
+  };
+  return <T>(fn: () => Promise<T>): Promise<T> =>
+    new Promise<T>((resolve, reject) => {
+      queue.push(() => {
+        fn().then(resolve, reject).finally(() => {
+          active--;
+          runNext();
+        });
+      });
+      runNext();
+    });
+}
+
+// One shared gate for every LLM call: floor(keys/2) concurrent requests.
+let llmLimit: (<T>(fn: () => Promise<T>) => Promise<T>) | null = null;
+function limitLlm<T>(fn: () => Promise<T>): Promise<T> {
+  if (!llmLimit) llmLimit = pLimit(Math.max(1, Math.floor(geminiKeys().length / 2)));
+  return llmLimit(fn);
+}
+
 async function llmJson<T>(system: string, user: string, maxTokens: number, schema?: object): Promise<T> {
   const keys = geminiKeys();
   if (keys.length === 0) throw new Error('GEMINIKEYS env var is empty or unset');
+  return limitLlm(() => attemptLlm<T>(system, user, maxTokens, schema, keys));
+}
 
-  let lastErr = '';
+// Models that failed for this run only (quota 429 / gone 404) — skipped without
+// spending retry budget. shortcut: not persisted across runs; if a model recovers
+// (or a new one appears in discovery) it is retried on the next generate:site.
+const deadModels = new Set<string>();
+let geminiModelCursor = 0;
+
+async function attemptLlm<T>(
+  system: string,
+  user: string,
+  maxTokens: number,
+  schema: object | undefined,
+  keys: string[],
+): Promise<T> {
   const models = await flashModels();
-  for (const model of models) {
-    for (let attempt = 0; attempt < keys.length; attempt++) {
-      const key = keys[(geminiKeyCursor + attempt) % keys.length];
-      try {
-        const res = await fetch(
-          'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(key),
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ role: 'user', parts: [{ text: `${system}\n\n${user}` }] }],
-              generationConfig: {
-                maxOutputTokens: maxTokens,
-                responseMimeType: 'application/json',
-                ...(schema ? { responseSchema: schema } : {}),
-                temperature: 0.7,
-              },
-            }),
-            signal: AbortSignal.timeout(120_000),
-          },
-        );
-
-        if (res.status === 429) {
-          lastErr = 'gemini ' + model + ' rate-limited (key ...' + key.slice(-6) + ')';
-          continue;
+  let lastErr = '';
+  let tries = 0;
+  // Bound the loop: each pass over the model list either finds a live model or
+  // marks it dead, so it terminates once every model is dead.
+  for (let i = 0; i < models.length * (MAX_LLM_ATTEMPTS + 1) && tries < MAX_LLM_ATTEMPTS; i++) {
+    // Rotate models across calls so quota-dead ones don't pin every attempt.
+    const model = models[geminiModelCursor % models.length];
+    geminiModelCursor = (geminiModelCursor + 1) % models.length;
+    if (deadModels.has(model)) continue;
+    // Roll the shared key cursor on every attempt so parallel calls and retries
+    // spread evenly across keys.
+    const key = keys[geminiKeyCursor % keys.length];
+    geminiKeyCursor = (geminiKeyCursor + 1) % keys.length;
+    tries++;
+    try {
+      const res = await fetch(
+        'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(key),
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: `${system}\n\n${user}` }] }],
+            generationConfig: {
+              maxOutputTokens: maxTokens,
+              responseMimeType: 'application/json',
+              ...(schema ? { responseSchema: schema } : {}),
+              temperature: 0.7,
+            },
+          }),
+          signal: AbortSignal.timeout(120_000),
+        },
+      );
+      if (!res.ok) {
+        const detail = res.status === 429 ? 'rate-limited' : (await res.text()).slice(0, 200);
+        lastErr = `gemini ${model} HTTP ${res.status} (${detail}) key ...${key.slice(-6)}`;
+        if (res.status === 429 || res.status === 404) {
+          // Persistent for this run: skip it for every later call, don't burn a try.
+          deadModels.add(model);
+          console.warn(`[site] model ${model} marked dead for this run (${res.status})`);
+          tries--;
         }
-        if (res.status === 503 || res.status === 500 || res.status === 404) {
-          lastErr = 'gemini ' + model + ' HTTP ' + res.status;
-          break;
-        }
-        if (!res.ok) {
-          const body = (await res.text()).slice(0, 300);
-          throw new Error('gemini ' + model + ' HTTP ' + res.status + ': ' + body);
-        }
-
-        const data = await res.json();
-        const text =
-          data?.candidates?.[0]?.content?.parts?.map((p) => p.text ?? '').join('') ?? '';
-        if (!text) {
-          const reason = data?.candidates?.[0]?.finishReason ?? data?.promptFeedback?.blockReason ?? 'no content';
-          throw new Error('gemini ' + model + ' returned no content (' + reason + ')');
-        }
-        geminiKeyCursor = (geminiKeyCursor + attempt) % keys.length;
-        return extractJson<T>(text);
-      } catch (err) {
-        const msg = (err && err.message) ? err.message : String(err);
-        if (msg.includes('HTTP 429')) {
-          lastErr = msg;
-          continue;
-        }
-        if (msg.includes('HTTP 503') || msg.includes('HTTP 500') || msg.includes('HTTP 404')) {
-          lastErr = msg;
-          break;
-        }
-        throw err;
+        continue;
       }
+      const data = await res.json();
+      const text =
+        data?.candidates?.[0]?.content?.parts?.map((p) => p.text ?? '').join('') ?? '';
+      if (!text) {
+        const reason = data?.candidates?.[0]?.finishReason ?? data?.promptFeedback?.blockReason ?? 'no content';
+        lastErr = `gemini ${model} returned no content (${reason})`;
+        continue;
+      }
+      return extractJson<T>(text);
+    } catch (err) {
+      lastErr = `gemini ${model}: ${message(err)}`;
     }
   }
-  throw new Error(lastErr || 'all gemini models exhausted');
+  throw new Error(lastErr || `gemini failed after ${MAX_LLM_ATTEMPTS} attempts`);
 }
 
 async function attempt<T>(label: string, fn: () => Promise<T>, fallback: T): Promise<T> {
@@ -641,6 +685,7 @@ async function main() {
   if (!process.env.FIRECRAWL_API_KEY || process.env.FIRECRAWL_API_KEY === 'fc-your-firecrawl-key') {
     console.warn('[site] FIRECRAWL_API_KEY missing or placeholder; stocks feed will use previous value');
   }
+  await flashModels(); // discover once up-front so parallel calls don't race model discovery
   const prev = await loadPrevious();
   let items: FeedItem[] = [];
   try {
@@ -662,42 +707,46 @@ async function main() {
     console.log(`[news] using ${items.length} RSS descriptions`);
   }
 
-  const news: NewsItem[] = [];
   const contents = new Map<string, string>();
-  for (const item of items) {
-    const content = item.description.replace(/<[^>]+>/g, ' ');
-    contents.set(item.link, content);
-    try {
-      console.log(`[news] rewriting: ${item.title.slice(0, 60)}…`);
-      const draft = await llmJson<WireDraft>(
-        NEWS_SYSTEM,
-        `Headline: ${item.title}\nPublished: ${item.pubDate}\nSource: ${item.link}\n\nArticle:\n${(content || item.title).slice(0, 4000)}`,
-        600,
-        {
-          type: 'object',
-          properties: {
-            tag: { type: 'string' },
-            title: { type: 'string' },
-            summary: { type: 'string' },
+  const drafts = await Promise.all(
+    items.map(async (item) => {
+      const content = item.description.replace(/<[^>]+>/g, ' ');
+      contents.set(item.link, content);
+      try {
+        console.log(`[news] rewriting: ${item.title.slice(0, 60)}…`);
+        const draft = await llmJson<WireDraft>(
+          NEWS_SYSTEM,
+          `Headline: ${item.title}\nPublished: ${item.pubDate}\nSource: ${item.link}\n\nArticle:\n${(content || item.title).slice(0, 4000)}`,
+          600,
+          {
+            type: 'object',
+            properties: {
+              tag: { type: 'string' },
+              title: { type: 'string' },
+              summary: { type: 'string' },
+            },
+            required: ['tag', 'title', 'summary'],
           },
-          required: ['tag', 'title', 'summary'],
-        },
-      );
-      if (!draft.tag || !draft.title || !draft.summary) throw new Error('llm reply missing fields');
-      const published = new Date(item.pubDate);
-      news.push({
-        slug: slugFromUrl(item.link),
-        tag: draft.tag,
-        title: draft.title,
-        summary: draft.summary,
-        headline: item.title,
-        url: item.link,
-        publishedAt: Number.isNaN(published.getTime()) ? item.pubDate : published.toISOString(),
-      });
-    } catch (err) {
-      console.warn(`[site] skipped (${message(err)}): ${item.title}`);
-    }
-  }
+        );
+        if (!draft.tag || !draft.title || !draft.summary) throw new Error('llm reply missing fields');
+        const published = new Date(item.pubDate);
+        return {
+          slug: slugFromUrl(item.link),
+          tag: draft.tag,
+          title: draft.title,
+          summary: draft.summary,
+          headline: item.title,
+          url: item.link,
+          publishedAt: Number.isNaN(published.getTime()) ? item.pubDate : published.toISOString(),
+        };
+      } catch (err) {
+        console.warn(`[site] skipped (${message(err)}): ${item.title}`);
+        return null;
+      }
+    }),
+  );
+  // filter keeps feed order (newest first) regardless of completion order
+  const news: NewsItem[] = drafts.filter((n): n is NewsItem => n !== null);
   if (news.length === 0) {
     console.warn('[news] no news items rewritten; keeping previous news.ts');
   } else {
@@ -726,15 +775,13 @@ async function main() {
   const quakes = await fetchQuakes(prev);
   const stocks = await fetchStocks(prev);
   const asteroid = await fetchAsteroid(prev);
-  const patches = await attempt(
-    'patches',
-    () => buildPatches(news, contents, { macro, weather, history, quakes }),
-    [],
-  );
-  const notice = await attempt('notice', () => buildNotice(news), prev?.notice ?? null);
-  const sanctions = await attempt('sanctions', () => buildSanctions(news), prev?.sanctions ?? []);
-  const gvg = await attempt('gvg', () => buildGvg(news), prev?.gvg ?? null);
-  const realm = await attempt('realm', () => buildRealm(news), prev?.realmStatuses ?? null);
+  const [patches, notice, sanctions, gvg, realm] = await Promise.all([
+    attempt('patches', () => buildPatches(news, contents, { macro, weather, history, quakes }), []),
+    attempt('notice', () => buildNotice(news), prev?.notice ?? null),
+    attempt('sanctions', () => buildSanctions(news), prev?.sanctions ?? []),
+    attempt('gvg', () => buildGvg(news), prev?.gvg ?? null),
+    attempt('realm', () => buildRealm(news), prev?.realmStatuses ?? null),
+  ]);
   console.log(
     `[site] patches: ${patches.length}, notice: ${notice ? 'ok' : 'none'}, sanctions: ${sanctions.length}, gvg: ${gvg ? 'ok' : 'none'}, realm: ${realm ? 'ok' : 'none'}, macro: ${macro ? `${macro.usdRate}${macro.angat ? ` / Angat ${macro.angat.level}m` : ''}` : 'none'}, weather: ${weather ? `${weather.temp}°C ${weather.desc}` : 'none'}, history: ${history ? 'ok' : 'none'}, quakes: ${quakes ? `${quakes.length} (M${quakes[0].mag})` : 'none'}`,
   );
