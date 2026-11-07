@@ -2,7 +2,18 @@ import { writeFileSync, readFileSync } from 'node:fs';
 import { stringify, parse } from 'yaml';
 
 // Load .env if present (Node 20.12+). No-op if the file doesn't exist.
-try { process.loadEnvFile(); } catch { /* no .env */ }
+// .env is this project's local source of truth: drop inherited values for keys it
+// defines before loading, because loadEnvFile never overrides — a stale OS-level
+// FIRECRAWL_API_KEY otherwise shadowed the file after a rotation (401s).
+const envFileKeys = new Set<string>();
+try {
+  const src = readFileSync('.env', 'utf8');
+  for (const m of src.matchAll(/^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=/gm)) {
+    envFileKeys.add(m[1]);
+    delete process.env[m[1]];
+  }
+  process.loadEnvFile();
+} catch { /* no .env — ambient env (CI, Dokploy) stays authoritative */ }
 import {
   extractJson,
   parseDamLevel,
@@ -42,6 +53,11 @@ const sectionStat = (label: string) =>
 /** LLM usage counters — proves the rolling key rule and sizes the retry cost. */
 const llmStats = { calls: 0, attempts: 0, keyUse: new Map<string, number>() };
 const keySuffix = (key: string) => key.slice(-6);
+/** Which secret is actually in effect, and from where — the 401 confusion was here. */
+const effectiveKey = (name: string) => {
+  const v = process.env[name];
+  return v ? `...${keySuffix(v)} (${envFileKeys.has(name) ? '.env' : 'ambient'})` : 'unset';
+};
 
 const RSS_FEED_URL = 'https://newsinfo.inquirer.net/feed';
 const FIRECRAWL_ENDPOINT = 'https://api.firecrawl.dev/v1/scrape';
@@ -228,11 +244,23 @@ async function llmJson<T>(system: string, user: string, maxTokens: number, schem
   return limitLlm(() => attemptLlm<T>(system, user, maxTokens, schema, keys));
 }
 
-// Models that failed for this run only (quota 429 / gone 404) — skipped without
-// spending retry budget. shortcut: not persisted across runs; if a model recovers
-// (or a new one appears in discovery) it is retried on the next generate:site.
-const deadModels = new Set<string>();
+// Models that failed persistently for this run only — skipped without spending
+// retry budget; the value is why it died (shown in the run summary).
+// shortcut: not persisted across runs; if a model recovers (or a new one appears
+// in discovery) it is retried on the next generate:site.
+const deadModels = new Map<string, string>();
+// A 429 may be model quota OR this key's quota: 2 strikes kill the key, 429s
+// from 2 distinct keys kill the model — one exhausted key must not mass-kill
+// models, and one bad model must not mass-kill keys.
+// shortcut: attribution assumes >=2 keys; a single-key setup kills the model on first 429.
+const deadKeys = new Set<string>();
+const key429Strikes = new Map<string, number>();
+const model429Keys = new Map<string, Set<string>>();
+// Parallel calls must not pile onto the same model: a hung one would stall every
+// call at once. Held while in flight; the pick scan prefers a free model.
+const inFlightModels = new Set<string>();
 let geminiModelCursor = 0;
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 async function attemptLlm<T>(
   system: string,
@@ -244,18 +272,48 @@ async function attemptLlm<T>(
   const models = await flashModels();
   let lastErr = '';
   let tries = 0;
+  const skip = new Set<string>(); // this call only: high demand / unattributed 429
+  let waitNext = false; // a burned failure just happened -> micro-backoff first
+  let refundHung = false; // only the first hang in a call is free
   llmStats.calls++;
-  // Bound the loop: each pass over the model list either finds a live model or
-  // marks it dead, so it terminates once every model is dead.
+  // Bound the loop: each iteration is one full scan over the model list, so it
+  // terminates once every model is dead or skipped (or the tries run out).
   for (let i = 0; i < models.length * (MAX_LLM_ATTEMPTS + 1) && tries < MAX_LLM_ATTEMPTS; i++) {
-    // Rotate models across calls so quota-dead ones don't pin every attempt.
-    const model = models[geminiModelCursor % models.length];
-    geminiModelCursor = (geminiModelCursor + 1) % models.length;
-    if (deadModels.has(model)) continue;
+    if (waitNext) {
+      waitNext = false;
+      await sleep(Math.min(500 * 2 ** (tries - 1), 2000)); // 0.5s, 1s, then 2s cap
+    }
+    // Round-robin pick: first model that is not dead, not skipped by this call,
+    // and not held by a parallel call; share one only if all live models are held.
+    let model = '';
+    let held = '';
+    for (let k = 0; k < models.length; k++) {
+      const cand = models[geminiModelCursor % models.length];
+      geminiModelCursor = (geminiModelCursor + 1) % models.length;
+      if (deadModels.has(cand) || skip.has(cand)) continue;
+      if (inFlightModels.has(cand)) {
+        if (!held) held = cand;
+        continue;
+      }
+      model = cand;
+      break;
+    }
+    if (!model) {
+      if (!held) continue; // all dead/skipped -> burn an i -> honest exit below
+      model = held; // contention (rare: 3 concurrent vs ~10 models): sharing beats stalling
+      warn(`[llm] every live model is in flight; sharing ${model}`);
+    }
     // Roll the shared key cursor on every attempt so parallel calls and retries
-    // spread evenly across keys.
-    const key = keys[geminiKeyCursor % keys.length];
-    geminiKeyCursor = (geminiKeyCursor + 1) % keys.length;
+    // spread evenly across keys; dead keys rotate out for the run.
+    let key = '';
+    for (let k = 0; k < keys.length; k++) {
+      const cand = keys[geminiKeyCursor % keys.length];
+      geminiKeyCursor = (geminiKeyCursor + 1) % keys.length;
+      if (deadKeys.has(cand)) continue;
+      key = cand;
+      break;
+    }
+    if (!key) throw new Error('gemini: every key reached 2 strikes; keys exhausted for this run');
     tries++;
     llmStats.attempts++;
     const sfx = keySuffix(key);
@@ -263,6 +321,7 @@ async function attemptLlm<T>(
     const who = `try ${tries}/${MAX_LLM_ATTEMPTS} ${model} key ...${sfx}`;
     const note = tries < MAX_LLM_ATTEMPTS ? ', retry' : '';
     const t = Date.now();
+    inFlightModels.add(model);
     try {
       const res = await fetch(
         'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(key),
@@ -278,19 +337,47 @@ async function attemptLlm<T>(
               temperature: 0.7,
             },
           }),
-          signal: AbortSignal.timeout(120_000),
+          signal: AbortSignal.timeout(60_000), // healthy calls top out ~37s; hangs never returned by 120s
         },
       );
       if (!res.ok) {
         const detail = res.status === 429 ? 'rate-limited' : (await res.text()).slice(0, 200);
         lastErr = `gemini ${model} HTTP ${res.status} (${detail}) key ...${sfx}`;
-        if (res.status === 429 || res.status === 404) {
-          // Persistent for this run: skip it for every later call, don't burn a try.
-          deadModels.add(model);
-          warn(`[llm] ${who} → HTTP ${res.status}; model marked dead for this run`);
+        if (res.status === 404) {
+          deadModels.set(model, 'HTTP 404');
+          warn(`[llm] ${who} → HTTP 404; model marked dead for this run`);
           tries--;
+        } else if (res.status === 429) {
+          // Attribute before banning (never burns a try): strike the key, count
+          // distinct keys seen on the model; kill each only once evidence is there.
+          tries--;
+          key429Strikes.set(key, (key429Strikes.get(key) ?? 0) + 1);
+          let keys429 = model429Keys.get(model);
+          if (!keys429) {
+            keys429 = new Set();
+            model429Keys.set(model, keys429);
+          }
+          keys429.add(key);
+          skip.add(model);
+          const strikes = key429Strikes.get(key) ?? 0;
+          if (strikes >= 2) {
+            deadKeys.add(key);
+            warn(`[llm] ${who} → HTTP 429; key marked dead for this run (${strikes} strikes)`);
+          }
+          if (keys429.size >= 2 || keys.length === 1) {
+            deadModels.set(model, 'HTTP 429');
+            warn(`[llm] ${who} → HTTP 429 from ${keys429.size} keys; model marked dead for this run`);
+          } else {
+            warn(`[llm] ${who} → HTTP 429; model skipped for this call (attribution ${keys429.size}/2 keys, key strike ${strikes}/2)`);
+          }
+        } else if (/high demand|overloaded/i.test(detail)) {
+          // Capacity spike ("spikes are usually temporary"): switch now, keep the try.
+          tries--;
+          skip.add(model);
+          warn(`[llm] ${who} → model in high demand; switching model (no try burned)`);
         } else {
-          warn(`[llm] ${who} → HTTP ${res.status}${note}`);
+          warn(`[llm] ${who} → HTTP ${res.status} (${detail})${note}`);
+          waitNext = true;
         }
         continue;
       }
@@ -301,6 +388,7 @@ async function attemptLlm<T>(
         const reason = data?.candidates?.[0]?.finishReason ?? data?.promptFeedback?.blockReason ?? 'no content';
         lastErr = `gemini ${model} returned no content (${reason})`;
         warn(`[llm] ${who} → no content (${reason})${note}`);
+        waitNext = true;
         continue;
       }
       const out = extractJson<T>(text);
@@ -308,11 +396,29 @@ async function attemptLlm<T>(
       return out;
     } catch (err) {
       lastErr = `gemini ${model}: ${message(err)}`;
-      warn(`[llm] ${who} → ${message(err)}${note}`);
+      if (err instanceof Error && err.name === 'TimeoutError') {
+        // A hang burns the whole timeout with zero output — never afford a second
+        // on this model. Only the first hang per call is refunded, so one
+        // pathological call can't chain hangs through the whole model list.
+        deadModels.set(model, 'timeout');
+        let refunded = '';
+        if (!refundHung) {
+          refundHung = true;
+          tries--;
+          refunded = ' (no try burned)';
+        }
+        warn(`[llm] ${who} → ${message(err)}; model marked unresponsive for this run${refunded}`);
+      } else {
+        warn(`[llm] ${who} → ${message(err)}${note}`);
+        waitNext = true;
+      }
+    } finally {
+      inFlightModels.delete(model);
     }
   }
   if (!lastErr) {
-    throw new Error(`gemini: every discovered model is dead for this run (${[...deadModels].join(', ') || 'none'})`);
+    const why = [...deadModels].map(([m, r]) => `${m} (${r})`).join(', ');
+    throw new Error(`gemini: every discovered model is dead for this run (${why || 'none'})`);
   }
   throw new Error(`gemini failed after ${tries} attempts: ${lastErr}`);
 }
@@ -762,6 +868,10 @@ async function main() {
   if (!process.env.FIRECRAWL_API_KEY || process.env.FIRECRAWL_API_KEY === 'fc-your-firecrawl-key') {
     warn('[site] FIRECRAWL_API_KEY missing or placeholder; stocks feed will use previous value');
   }
+  log(
+    `[site] secrets: GEMINIKEYS ${geminiKeys().length} keys (${envFileKeys.has('GEMINIKEYS') ? '.env' : 'ambient'})` +
+      ` · FIRECRAWL_API_KEY ${effectiveKey('FIRECRAWL_API_KEY')} · NASA_API_KEY ${effectiveKey('NASA_API_KEY')}`,
+  );
   await flashModels(); // discover once up-front so parallel calls don't race model discovery
   const prev = await loadPrevious();
   let items: FeedItem[] = [];
@@ -917,7 +1027,9 @@ async function main() {
       `[site]   fetches  ${['macro', 'angat', 'weather', 'history', 'quakes', 'stocks', 'asteroid'].map(sectionStat).join(' · ')}`,
       `[site]   llm      ${llmStats.calls} calls / ${llmStats.attempts} attempts · keys ${
         keysNow.length ? keysNow.map((k) => `...${keySuffix(k)}:${llmStats.keyUse.get(keySuffix(k)) ?? 0}`).join(' ') : 'none'
-      } · dead ${[...deadModels].join(', ') || 'none'}`,
+      } · dead ${deadModels.size ? [...deadModels].map(([m, r]) => `${m} (${r})`).join(', ') : 'none'}${
+        deadKeys.size ? ` · dead keys ${deadKeys.size}` : ''
+      }`,
       `[site]   stale    ${staleSections.size ? [...staleSections].join(', ') : 'none'}`,
       `[site]   output   ${news.length} news · ${patches.length} patches · macro ${macro?.usdRate ?? '—'}${
         macro?.angat ? ` / Angat ${macro.angat.level}m` : ''

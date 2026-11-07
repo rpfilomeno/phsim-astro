@@ -1,14 +1,14 @@
 ---
 slug: maguindanao-del-sur-village-councilman-survives-ambush
-tag: SERVER SECURITY
-title: Barangay Councilor Survives Targeted Pk Attempt in Datu Piang Zone
-summary: Councilor Abdul Manab Guialodin narrowly escaped a lethal ambush by an
-  unidentified hostile player in Barangay Liong. The target survived despite
-  sustaining multiple debuffs from incoming projectile attacks.
+tag: PVP EVENT
+title: Councilman Guialodin dodges PK attempt in Datu Piang; assailant flees
+summary: Local councilman Abdul Manab Guialodin survived an ambush in
+  Maguindanao del Sur. The attacker remains unidentified, and the victim
+  sustained gunshot wounds.
 headline: Maguindanao del Sur village councilman survives ambush
 url: https://newsinfo.inquirer.net/2337477/maguindanao-del-sur-village-councilman-survives-ambush
 publishedAt: 2026-11-07T09:35:52.000Z
-generatedAt: 2026-11-07T03:19:39.393Z
+generatedAt: 2026-11-07T04:20:45.108Z
 ---
 
-Councilor Abdul Manab Guialodin narrowly escaped a lethal ambush by an unidentified hostile player in Barangay Liong. The target survived despite sustaining multiple debuffs from incoming projectile attacks.
+Local councilman Abdul Manab Guialodin survived an ambush in Maguindanao del Sur. The attacker remains unidentified, and the victim sustained gunshot wounds.

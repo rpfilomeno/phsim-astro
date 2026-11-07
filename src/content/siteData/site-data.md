@@ -1,32 +1,40 @@
 ---
-generatedAt: 2026-11-07T03:21:54.267Z
+generatedAt: 2026-11-07T04:21:00.738Z
 notice:
-  headline: "[EMERGENCY NOTICE] Nationwide 'Wet' Debuff and Shear Line Active"
-  body: GM Pagasa warns all players that Amihan and a Shear Line are dropping
-    heavy rains across the map. Expect zero visibility and slippery terrain.
+  headline: "[EMERGENCY NOTICE] Nationwide Weather Debuffs Incoming"
+  body: PAGASA warns all players to equip waterproof gear as Amihan, easterlies,
+    and a shear line combine to cast heavy rain debuffs across the entire
+    Republic Server.
 sanctions:
-  - player: "Player: Loren_Legarda"
+  - player: "Player: suv_driver_edsa"
+    penalty: "BAN: 90 DAYS"
+    infraction: The player utilized a vehicle mount to grief another user in a fatal
+      collision, resulting in a temporary license suspension and item
+      impoundment.
+  - player: "Guild: baguio_supermarket_traders"
+    penalty: PENALTY -50000 Z
+    infraction: The guild attempted to vendor 81 kilograms of spoiled fish items,
+      failing the server health and safety check.
+  - player: "Player: unidentified_ambusher"
     penalty: PERM BAN
-    infraction: Unauthorized dumping of cremated pet remains in San Jose del Monte
-      triggered a severe environmental violation alert.
-  - player: "Guild: Jail_Instance_Admins"
-    penalty: "BAN: 30 DAYS"
-    infraction: Providing unauthorized assist buffs and special treatment to a
-      high-ranking player inside the New Quezon City Jail instance.
+    infraction: The player engaged in a malicious PK (Player Kill) attempt against a
+      local councilman in Maguindanao del Sur, violating the server's
+      anti-violence policy.
 gvg:
-  title: Councilor Survives Ambush in Maguindanao del Sur Raid
-  label: GUILD WARFARE ALERT
-  body: A high-ranking player in the Maguindanao del Sur guild narrowly escaped a
-    lethal ambush by unidentified hostiles in Barangay Liong. The target
-    survived despite suffering multiple critical debuffs from incoming
-    projectiles during the skirmish.
+  title: Sara Camp Claims Impeachment Prosecution Lacks Evidence
+  label: GUILD WARFARE TRIAL
+  body: Vice President Sara Duterte's defense camp stated that the impeachment
+    prosecution has failed to prove its case and is relying purely on
+    speculation. As the tribunal siege prepares to resume, both rival factions
+    are locking horns and fortifying their positions for the next major
+    political clash.
 realmStatuses:
   - region: Luzon
-    status: "[TAINTED SEAFOOD DETECTED]"
+    status: "[SPOILED FISH DETECTED]"
   - region: Visayas
-    status: "[SARDINES FISHING BAN]"
+    status: "[FISHING BAN ACTIVE]"
   - region: Mindanao
-    status: "[HEATWAVE FIRE SURGE]"
+    status: "[INVENTORY CLEARANCE SUCCESSFUL]"
 macro:
   usdRate: 63.017
   usdDate: 2026-11-06
@@ -36,11 +44,11 @@ macro:
     ruleCurve: 199.26
     observedAt: November 07,2026 08:00:00 am
 weather:
-  temp: 30
-  feels: 33
-  humidity: 59
+  temp: 31
+  feels: 34
+  humidity: 57
   desc: Patchy rain nearby
-  observedAt: 02:12 AM
+  observedAt: 03:42 AM
 history:
   title: Today in Philippine history, November 7, 1975, the Metropolitan Manila
     Commission was created
@@ -50,6 +58,27 @@ history:
     municipalities into an integrated unit.
   url: https://kahimyang.com/kauswagan/articles/2440/today-in-philippine-history-november-7-1975-the-metropolitan-manila-commission-was-created
 quakes:
+  - time: 07 November 2026 - 11:37 AM
+    lat: "09.07"
+    lon: "126.21"
+    depth: "062"
+    mag: "1.9"
+    location: 005 km S 89° E of City Of Tandag (Surigao Del Sur)
+    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1107_033717_B1.html
+  - time: 07 November 2026 - 11:37 AM
+    lat: "19.32"
+    lon: "121.21"
+    depth: "033"
+    mag: "2.4"
+    location: 023 km N 02° E of Dalupiri Island (Calayan) (Cagayan)
+    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1107_033700_B1.html
+  - time: 07 November 2026 - 11:27 AM
+    lat: "05.79"
+    lon: "125.10"
+    depth: "015"
+    mag: "2.1"
+    location: 012 km S 72° W of Glan (Sarangani)
+    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1107_032732_B1F.html
   - time: 07 November 2026 - 11:01 AM
     lat: "13.63"
     lon: "120.66"
@@ -99,35 +128,13 @@ quakes:
     mag: "1.8"
     location: 040 km S 59° W of Mariveles (Bataan)
     url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1107_002032_B1.html
-  - time: 07 November 2026 - 07:29 AM
-    lat: "06.46"
-    lon: "126.30"
-    depth: "130"
-    mag: "2.1"
-    location: 033 km S 49° E of Governor Generoso (Davao Oriental)
-    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_232948_B1.html
-  - time: 07 November 2026 - 06:59 AM
-    lat: "05.38"
-    lon: "125.28"
-    depth: "032"
-    mag: "1.8"
-    location: 016 km S 77° W of Balut Island (Municipality Of Sarangani) (Davao
-      Occidental)
-    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_225922_B1F.html
-  - time: 07 November 2026 - 06:25 AM
-    lat: "13.41"
-    lon: "124.24"
-    depth: "013"
-    mag: "3.9"
-    location: 018 km S 04° E of Virac (Catanduanes)
-    url: https://earthquake.phivolcs.dost.gov.ph/2026_Earthquake_Information/November/2026_1106_222518_B3F.html
 stocks:
   gainer:
     ticker: PHES
-    change: 22.06%
+    change: 9.64%
   loser:
-    ticker: ABSP
-    change: -22.68%
+    ticker: PAX
+    change: -6.95%
 asteroid:
   name: 2012 PP28
   diameter: 0.8318403423
