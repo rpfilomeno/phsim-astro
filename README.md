@@ -33,6 +33,24 @@ daily at `00:00 UTC` (08:00 Asia/Manila). Pushes to `main` do not deploy. Add `G
 `FIRECRAWL_API_KEY`, and `NASA_API_KEY` as repository secrets. The workflow runs
 `npm run generate:site` explicitly, then `npm run build` (which does not fetch), and deploys.
 
+### Trigger via webhook (cron-job.org)
+
+Because the workflow already declares `workflow_dispatch`, an external scheduler can queue a
+run through GitHub's REST API — no workflow change needed. Create a fine-grained PAT for this
+repository with `Actions: Read and write` + `Contents: Read` (Metadata is added automatically),
+then create a cron job on [cron-job.org](https://cron-job.org):
+
+| Field | Value |
+| ----- | ----- |
+| URL | `https://api.github.com/repos/rpfilomeno/phsim-astro/actions/workflows/deploy.yml/dispatches` |
+| Request method | `POST` |
+| Request body | `{"ref":"main"}` |
+| Headers | `Accept: application/vnd.github+json`<br>`Content-Type: application/json`<br>`X-GitHub-Api-Version: 2022-11-28`<br>`Authorization: Bearer <PAT>` |
+
+A `2xx` response means the run was queued; it appears in the Actions tab like a manual run.
+Enable the job's failure e-mail alerts and rotate the PAT before it expires — an expired token
+fails with `401` and the trigger silently stops firing.
+
 Custom domain: `phsim.rogverse.fyi` (see `public/CNAME`). Point a DNS CNAME record at
 `rpfilomeno.github.io`, then set the custom domain under Settings → Pages. The site is served
 from the domain root, so no `BASE_PATH` is needed.
@@ -89,22 +107,31 @@ scripts/
 ```
 
 All patches are generated dynamically by `npm run generate:site` (up to 5 from today's news +
-live data). Categories and badge styles are derived from the generated patches.
+live data). Categories and badge styles are derived from the generated patches. The patch
+window's log filename is stamped from `siteData.generatedAt` as
+`PH_PatchLog_Episode_7107_Archipelago_<YYYYMMDD-HHmm>.exe` (Asia/Manila), falling back to the
+unstamped name when no timestamp exists.
 
 Editable content cards:
 
 - `src/content/kafra/kafra-message.md` — Kafra service desk staff: frontmatter sets name,
   booth, branch, avatar key, and greeting language; the markdown body is the greeting.
 - `src/content/gmOnDuty/gm-on-duty.md` — GM on duty card: frontmatter sets name, role,
-  location, status, and avatar key; the body is the GM message.
+  location, status, and avatar key; the body is the GM message. The card doubles as the button
+  that opens the Botpress webchat bubble.
 - `src/config/gmAvatars.ts` — maps avatar keys to the images in `src/assets/avatars/`.
 - `src/config/reboot.ts` — weekly reboot day, hour, window length, extension hours, and note.
+- `src/layouts/Layout.astro` — the Botpress webchat embed (loader + bot config scripts) and
+  its site-palette theming (navy/gold CSS variables injected into the widget's shadow root).
 
 `npm run generate:site` rebuilds all generated data in one run:
 
 - `src/content/news/*.md` — news wire: one markdown file per article, read from the Inquirer
   RSS feed (`https://newsinfo.inquirer.net/feed`) and rewritten in the Midgarts voice through
-  the Google Gemini API (flash models, latest-to-oldest, keys from `GEMINIKEYS`).
+  the Google Gemini API (flash models, latest-to-oldest, keys from `GEMINIKEYS`). Rewrites run
+  in parallel at `floor(keys / 2)` concurrent Gemini calls, each with up to 3 attempts; the key
+  rolls on every attempt so all keys are used equally, models answering `429`/`404` are marked
+  dead for the rest of the run, and articles that still fail are skipped (logged as `skipped`).
 - `src/content/siteData/site-data.md` — generated patches, emergency ticker notice, GM
   sanctions, GvG bulletin, realm server statuses (all LLM), plus live data: USD→Zeny from the
   Frankfurter API, the Angat Dam level from PAGASA's flood page, Manila weather from wttr.in,
