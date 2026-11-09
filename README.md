@@ -28,8 +28,8 @@ Then run `npm run generate:site`.
 
 ## Deploy
 
-The site deploys to GitHub Pages via `.github/workflows/deploy.yml` on manual dispatch and
-daily at `00:00 UTC` (08:00 Asia/Manila). Pushes to `main` do not deploy. Add `GEMINIKEYS`,
+The site deploys to GitHub Pages via `.github/workflows/deploy.yml` on manual dispatch only —
+there is no built-in schedule. Pushes to `main` do not deploy. Add `GEMINIKEYS`,
 `FIRECRAWL_API_KEY`, and `NASA_API_KEY` as repository secrets. The workflow runs
 `npm run generate:site` explicitly, then `npm run build` (which does not fetch), and deploys.
 
